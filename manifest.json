@@ -1,0 +1,46 @@
+{
+  "manifest_version": 3,
+  "name": "Republic of Suncity Wallet",
+  "version": "1.0.0",
+  "description": "Official wallet for Republic of Suncity blockchain government services",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "clipboardWrite"
+  ],
+  "host_permissions": [
+    "http://localhost:26657/*",
+    "http://localhost:1317/*"
+  ],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "popup/assets/icon16.png",
+      "32": "popup/assets/icon32.png",
+      "48": "popup/assets/icon48.png",
+      "128": "popup/assets/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content/content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["content/inject.js"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "icons": {
+    "16": "popup/assets/icon16.png",
+    "32": "popup/assets/icon32.png",
+    "48": "popup/assets/icon48.png",
+    "128": "popup/assets/icon128.png"
+  }
+}

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Republic of Suncity Wallet</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Loading Screen -->
+        <div id="loading-screen" class="screen">
+            <div class="header">
+                <div class="logo">
+                    <div class="sun-icon">☀</div>
+                    <div class="logo-text">Republic of Suncity</div>
+                </div>
+                <div class="motto">Lux, Libertas, Prosperitas</div>
+            </div>
+            <div class="loading-content">
+                <div class="spinner"></div>
+                <p>Loading wallet...</p>
+            </div>
+        </div>
+
+        <!-- Welcome Screen (First Time) -->
+        <div id="welcome-screen" class="screen hidden">
+            <div class="header">
+                <div class="logo">
+                    <div class="sun-icon">☀</div>
+                    <div class="logo-text">Republic of Suncity</div>
+                </div>
+                <div class="motto">Lux, Libertas, Prosperitas</div>
+            </div>
+            <div class="welcome-content">
+                <h2>Welcome to the Republic of Suncity</h2>
+                <p>Your gateway to blockchain-powered government services</p>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="create-wallet-btn">
+                        Create New Wallet
+                    </button>
+                    <button class="btn btn-secondary" id="import-wallet-btn">
+                        Import Existing Wallet
+                    </button>
+                </div>
+
+                <div class="features-list">
+                    <div class="feature-item">
+                        <div class="feature-icon">🏡</div>
+                        <div class="feature-text">Property Registration</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">👤</div>
+                        <div class="feature-text">Citizen Services</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">🗳️</div>
+                        <div class="feature-text">Democratic Voting</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">💰</div>
+                        <div class="feature-text">SUNC Transactions</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Create Wallet Screen -->
+        <div id="create-wallet-screen" class="screen hidden">
+            <div class="header">
+                <button class="back-btn" id="back-to-welcome">←</button>
+                <div class="logo">
+                    <div class="sun-icon">☀</div>
+                    <div class="logo-text">Create Wallet</div>
+                </div>
+            </div>
+            <div class="form-content">
+                <div class="step" id="step-1">
+                    <h3>Create Secure Password</h3>
+                    <p>This password will protect your wallet on this device.</p>
+                    
+                    <input type="password" id="new-password" placeholder="Enter password" class="form-input">
+                    <input type="password" id="confirm-password" placeholder="Confirm password" class="form-input">
+                    
+                    <div class="password-requirements">
+                        <div class="requirement" data-req="length">
+                            <span class="req-icon">✗</span>
+                            At least 8 characters
+                        </div>
+                        <div class="requirement" data-req="uppercase">
+                            <span class="req-icon">✗</span>
+                            One uppercase letter
+                        </div>
+                        <div class="requirement" data-req="number">
+                            <span class="req-icon">✗</span>
+                            One number
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary" id="continue-to-mnemonic" disabled>
+                        Continue
+                    </button>
+                </div>
+
+                <div class="step hidden" id="step-2">
+                    <h3>Your Recovery Phrase</h3>
+                    <p>Write down these 24 words in order. You'll need them to recover your wallet.</p>
+                    
+                    <div class="mnemonic-display" id="mnemonic-display">
+                        <!-- Mnemonic words will be generated here -->
+                    </div>
+                    
+                    <div class="warning-box">
+                        <strong>⚠️ Important:</strong>
+                        <ul>
+                            <li>Store this phrase securely and privately</li>
+                            <li>Never share it with anyone</li>
+                            <li>We cannot recover your wallet without this phrase</li>
+                        </ul>
+                    </div>
+                    
+                    <button class="btn btn-primary" id="continue-to-verify">
+                        I've Saved My Recovery Phrase
+                    </button>
+                </div>
+
+                <div class="step hidden" id="step-3">
+                    <h3>Verify Recovery Phrase</h3>
+                    <p>Select the words in the correct order to verify your recovery phrase.</p>
+                    
+                    <div class="verify-mnemonic">
+                        <div class="word-slots" id="word-slots">
+                            <!-- Word slots will be generated here -->
+                        </div>
+                        <div class="word-options" id="word-options">
+                            <!-- Shuffled word options will be generated here -->
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary" id="create-wallet-final" disabled>
+                        Create Wallet
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Import Wallet Screen -->
+        <div id="import-wallet-screen" class="screen hidden">
+            <div class="header">
+                <button class="back-btn" id="back-to-welcome-import">←</button>
+                <div class="logo">
+                    <div class="sun-icon">☀</div>
+                    <div class="logo-text">Import Wallet</div>
+                </div>
+            </div>
+            <div class="form-content">
+                <h3>Enter Recovery Phrase</h3>
+                <p>Enter your 12 or 24 word recovery phrase to restore your wallet.</p>
+                
+                <textarea id="import-mnemonic" placeholder="Enter your recovery phrase here..." 
+                          class="form-input mnemonic-input" rows="4"></textarea>
+                
+                <h3>Create Password</h3>
+                <p>Create a password to protect your wallet on this device.</p>
+                
+                <input type="password" id="import-password" placeholder="Enter password" class="form-input">
+                <input type="password" id="import-confirm-password" placeholder="Confirm password" class="form-input">
+                
+                <button class="btn btn-primary" id="import-wallet-final" disabled>
+                    Import Wallet
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Wallet Interface -->
+        <div id="main-wallet-screen" class="screen hidden">
+            <div class="header">
+                <div class="wallet-status" title="Connected to Republic of Suncity"></div>
+                <div class="logo">
+                    <div class="sun-icon">☀</div>
+                    <div class="logo-text">Republic of Suncity</div>
+                </div>
+                <div class="motto">Lux, Libertas, Prosperitas</div>
+            </div>
+
+            <div class="nav-tabs">
+                <button class="nav-tab active" data-tab="wallet">Wallet</button>
+                <button class="nav-tab" data-tab="government">Government</button>
+                <button class="nav-tab" data-tab="voting">Voting</button>
+                <button class="nav-tab" data-tab="settings">Settings</button>
+            </div>
+
+            <div class="tab-content">
+                <!-- Wallet Tab -->
+                <div id="wallet-tab" class="tab-panel">
+                    <div class="balance-card">
+                        <div class="balance-amount" id="balance-amount">0.000000</div>
+                        <div class="balance-currency">SUNC</div>
+                        <div class="address-display" id="user-address">Loading...</div>
+                        
+                        <div class="action-buttons">
+                            <button class="btn btn-primary" id="send-btn">
+                                <span>📤</span> Send
+                            </button>
+                            <button class="btn btn-secondary" id="receive-btn">
+                                <span>📥</span> Receive
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="section-title">Recent Transactions</div>
+                    <div class="transaction-list" id="transaction-list">
+                        <div class="empty-state">
+                            <p>No transactions yet</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Government Tab -->
+                <div id="government-tab" class="tab-panel hidden">
+                    <div class="government-services">
+                        <div class="service-card" data-service="land">
+                            <div class="service-icon land-icon">🏡</div>
+                            <div class="service-title">Land Registration</div>
+                            <div class="service-description">Register property ownership and transfer land titles securely on the blockchain</div>
+                        </div>
+
+                        <div class="service-card" data-service="citizen">
+                            <div class="service-icon citizen-icon">👤</div>
+                            <div class="service-title">Citizen Registration</div>
+                            <div class="service-description">Register as a Republic of Suncity citizen and manage your civic profile</div>
+                        </div>
+
+                        <div class="service-card" data-service="records">
+                            <div class="service-icon vote-icon">📋</div>
+                            <div class="service-title">Public Records</div>
+                            <div class="service-description">Search and view public blockchain records and government transactions</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Voting Tab -->
+                <div id="voting-tab" class="tab-panel hidden">
+                    <div id="proposals-list">
+                        <div class="empty-state">
+                            <p>No active proposals</p>
+                            <button class="btn btn-secondary" id="refresh-proposals">
+                                Refresh Proposals
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Tab -->
+                <div id="settings-tab" class="tab-panel hidden">
+                    <div class="settings-grid">
+                        <div class="setting-item" data-setting="network">
+                            <div class="setting-title">Network Configuration</div>
+                            <div class="setting-description">Manage RPC endpoints and network settings</div>
+                        </div>
+
+                        <div class="setting-item" data-setting="security">
+                            <div class="setting-title">Security & Privacy</div>
+                            <div class="setting-description">Password settings and wallet backup options</div>
+                        </div>
+
+                        <div class="setting-item" data-setting="export">
+                            <div class="setting-title">Export Private Key</div>
+                            <div class="setting-description">Backup your wallet's private key securely</div>
+                        </div>
+
+                        <div class="setting-item" data-setting="about">
+                            <div class="setting-title">About</div>
+                            <div class="setting-description">Version info and Republic of Suncity links</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Send Token Modal -->
+        <div id="send-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Send SUNC</h3>
+                    <button class="close-modal" id="close-send-modal">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Recipient Address</label>
+                        <input type="text" id="send-address" placeholder="sunc1..." class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label>Amount (SUNC)</label>
+                        <input type="number" id="send-amount" placeholder="0.000000" class="form-input" step="0.000001">
+                    </div>
+                    <div class="form-group">
+                        <label>Memo (Optional)</label>
+                        <input type="text" id="send-memo" placeholder="Transaction note" class="form-input">
+                    </div>
+                    <div class="fee-info">
+                        <span>Network Fee: 0.005000 SUNC</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="cancel-send">Cancel</button>
+                    <button class="btn btn-primary" id="confirm-send">Send</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Receive Modal -->
+        <div id="receive-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Receive SUNC</h3>
+                    <button class="close-modal" id="close-receive-modal">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="qr-code-container">
+                        <div class="qr-placeholder">
+                            <div class="sun-icon large">☀</div>
+                            <p>QR Code</p>
+                        </div>
+                    </div>
+                    <div class="address-copy">
+                        <input type="text" id="copy-address" readonly class="form-input">
+                        <button class="btn btn-secondary" id="copy-address-btn">Copy</button>
+                    </div>
+                    <p class="receive-note">Share this address to receive SUNC tokens</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>

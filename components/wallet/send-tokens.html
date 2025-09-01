@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send SUNC - Republic of Suncity Wallet</title>
+    <link rel="stylesheet" href="../../popup/popup.css">
+    <link rel="stylesheet" href="../../styles/components.css">
+    <style>
+        body {
+            width: 400px;
+            height: 600px;
+            margin: 0;
+            font-family: 'Inter', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #87CEEB 0%, #b8dcf0 100%);
+        }
+
+        .send-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .send-header {
+            background: #87CEEB;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .back-button {
+            position: absolute;
+            left: 15px;
+            top: 20px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #1a1a1a;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .send-title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin: 0;
+        }
+
+        .send-form {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .form-section {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1a1a1a;
+            font-size: 14px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e6ed;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #87CEEB;
+        }
+
+        .form-input.error {
+            border-color: #f44336;
+        }
+
+        .input-helper {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 6px;
+        }
+
+        .input-error {
+            font-size: 12px;
+            color: #f44336;
+            margin-top: 6px;
+        }
+
+        .amount-input-container {
+            position: relative;
+        }
+
+        .currency-label {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            font-weight: 600;
+            pointer-events: none;
+        }
+
+        .balance-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .available-balance {
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        .max-button {
+            background: #FFD700;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            color: #1a1a1a;
+            transition: background 0.3s ease;
+        }
+
+        .max-button:hover {
+            background: #ffcc00;
+        }
+
+        .fee-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+
+        .fee-title {
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .fee-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .fee-option {
+            padding: 8px 12px;
+            border: 2px solid #e0e6ed;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+            font-size: 12px;
+        }
+
+        .fee-option.selected {
+            border-color: #FFD700;
+            background: #FFD700;
+            color: #1a1a1a;
+        }
+
+        .fee-option:hover:not(.selected) {
+            border-color: #87CEEB;
+        }
+
+        .fee-label {
+            font-weight: 600;
+            display: block;
+        }
+
+        .fee-amount {
+            font-size: 10px;
+            color: #6c757d;
+            margin-top: 2px;
+        }
+
+        .fee-option.selected .fee-amount {
+            color: #1a1a1a;
+        }
+
+        .estimated-time {
+            font-size: 11px;
+            color: #6c757d;
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .transaction-summary {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .summary-title {
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .summary-label {
+            color: #6c757d;
+        }
+
+        .summary-value {
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .summary-total {
+            border-top: 1px solid #e0e6ed;
+            padding-top: 8px;
+            margin-top: 8px;
+        }
+
+        .send-actions {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-top: 1px solid #e0e6ed;
+        }
+
+        .send-button {
+            width: 100%;
+            padding: 14px;
+            background: #87CEEB;
+            color: #1a1a1a;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(135, 206, 235, 0.3);
+        }
+
+        .send-button:hover:not(:disabled) {
+            background: #6bb6ff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(135, 206, 235, 0.4);
+        }
+
+        .send-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .address-book-button {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #87CEEB;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 4px;
+        }
+
+        .qr-scan-button {
+            position: absolute;
+            right: 50px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #87CEEB;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px;
+        }
+
+        .recent-addresses {
+            margin-top: 8px;
+        }
+
+        .recent-address {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid #e0e6ed;
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin-bottom: 6px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            font-size: 12px;
+        }
+
+        .recent-address:hover {
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .recent-address-label {
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 2px;
+        }
+
+        .recent-address-value {
+            font-family: monospace;
+            color: #6c757d;
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e0e6ed;
+            border-top: 4px solid #87CEEB;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .confirmation-dialog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .dialog-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 350px;
+            margin: 20px;
+        }
+
+        .dialog-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .dialog-details {
+            margin-bottom: 20px;
+        }
+
+        .dialog-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .dialog-button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dialog-button.cancel {
+            background: #f8f9fa;
+            color: #6c757d;
+            border: 1px solid #e0e6ed;
+        }
+
+        .dialog-button.confirm {
+            background: #87CEEB;
+            color: #1a1a1a;
+        }
+
+        .dialog-button:hover {
+            transform: translateY(-1px);
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="send-container">
+        <div class="send-header">
+            <button class="back-button" id="backButton">←</button>
+            <h1 class="send-title">Send SUNC</h1>
+        </div>
+
+        <div class="send-form">
+            <!-- Recipient Section -->
+            <div class="form-section">
+                <label class="form-label" for="recipientAddress">Recipient Address</label>
+                <div class="recipient-input-container" style="position: relative;">
+                    <input 
+                        type="text" 
+                        id="recipientAddress" 
+                        class="form-input" 
+                        placeholder="sunc1..."
+                        spellcheck="false"
+                    >
+                    <button class="qr-scan-button" title="Scan QR Code">📷</button>
+                    <button class="address-book-button" title="Address Book">📋</button>
+                </div>
+                <div class="input-helper" id="recipientHelper">Enter or scan a Suncity address</div>
+                <div class="input-error hidden" id="recipientError"></div>
+                
+                <!-- Recent Addresses -->
+                <div class="recent-addresses hidden" id="recentAddresses">
+                    <div class="recent-address">
+                        <div class="recent-address-label">Alice Property</div>
+                        <div class="recent-address-value">sunc1abc...xyz789</div>
+                    </div>
+                    <div class="recent-address">
+                        <div class="recent-address-label">Bob Citizen</div>
+                        <div class="recent-address-value">sunc1def...uvw456</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Amount Section -->
+            <div class="form-section">
+                <div class="balance-info">
+                    <label class="form-label">Amount</label>
+                    <div>
+                        <span class="available-balance">Available: <span id="availableBalance">1,250.000000 SUNC</span></span>
+                        <button class="max-button" id="maxButton">MAX</button>
+                    </div>
+                </div>
+                <div class="amount-input-container">
+                    <input 
+                        type="number" 
+                        id="sendAmount" 
+                        class="form-input" 
+                        placeholder="0.000000"
+                        step="0.000001"
+                        min="0"
+                    >
+                    <span class="currency-label">SUNC</span>
+                </div>
+                <div class="input-helper" id="amountHelper">Minimum: 0.000001 SUNC</div>
+                <div class="input-error hidden" id="amountError"></div>
+            </div>
+
+            <!-- Memo Section -->
+            <div class="form-section">
+                <label class="form-label" for="transactionMemo">Memo (Optional)</label>
+                <input 
+                    type="text" 
+                    id="transactionMemo" 
+                    class="form-input" 
+                    placeholder="Add a note..."
+                    maxlength="256"
+                >
+                <div class="input-helper">Add a note to your transaction (max 256 characters)</div>
+            </div>
+
+            <!-- Fee Section -->
+            <div class="fee-section">
+                <div class="fee-title">Network Fee</div>
+                <div class="fee-options">
+                    <div class="fee-option" data-speed="slow">
+                        <span class="fee-label">Slow</span>
+                        <div class="fee-amount">0.003 SUNC</div>
+                    </div>
+                    <div class="fee-option selected" data-speed="standard">
+                        <span class="fee-label">Standard</span>
+                        <div class="fee-amount">0.005 SUNC</div>
+                    </div>
+                    <div class="fee-option" data-speed="fast">
+                        <span class="fee-label">Fast</span>
+                        <div class="fee-amount">0.008 SUNC</div>
+                    </div>
+                </div>
+                <div class="estimated-time">Estimated confirmation time: ~6 seconds</div>
+            </div>
+
+            <!-- Transaction Summary -->
+            <div class="transaction-summary">
+                <div class="summary-title">Transaction Summary</div>
+                <div class="summary-row">
+                    <span class="summary-label">Send Amount:</span>
+                    <span class="summary-value" id="summaryAmount">0.000000 SUNC</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Network Fee:</span>
+                    <span class="summary-value" id="summaryFee">0.005000 SUNC</span>
+                </div>
+                <div class="summary-row summary-total">
+                    <span class="summary-label">Total:</span>
+                    <span class="summary-value" id="summaryTotal">0.005000 SUNC</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="send-actions">
+            <button class="send-button" id="sendButton" disabled>
+                Review Transaction
+            </button>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div class="loading-overlay hidden" id="loadingOverlay">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Processing transaction...</div>
+        </div>
+    </div>
+
+    <!-- Confirmation Dialog -->
+    <div class="confirmation-dialog hidden" id="confirmationDialog">
+        <div class="dialog-content">
+            <div class="dialog-title">Confirm Transaction</div>
+            <div class="dialog-details">
+                <div class="summary-row">
+                    <span class="summary-label">To:</span>
+                    <span class="summary-value" id="confirmRecipient">-</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Amount:</span>
+                    <span class="summary-value" id="confirmAmount">-</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Fee:</span>
+                    <span class="summary-value" id="confirmFee">-</span>
+                </div>
+                <div class="summary-row summary-total">
+                    <span class="summary-label">Total:</span>
+                    <span class="summary-value" id="confirmTotal">-</span>
+                </div>
+            </div>
+            <div class="dialog-actions">
+                <button class="dialog-button cancel" id="cancelButton">Cancel</button>
+                <button class="dialog-button confirm" id="confirmButton">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize send tokens functionality
+        class SendTokensHandler {
+            constructor() {
+                this.selectedFeeSpeed = 'standard';
+                this.availableBalance = 1250.000000; // Mock balance
+                this.feeAmounts = {
+                    slow: 0.003,
+                    standard: 0.005,
+                    fast: 0.008
+                };
+                
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.loadWalletData();
+            }
+
+            setupEventListeners() {
+                // Back button
+                document.getElementById('backButton').addEventListener('click', () => {
+                    window.close();
+                });
+
+                // Form inputs
+                document.getElementById('recipientAddress').addEventListener('input', () => {
+                    this.validateRecipient();
+                    this.updateSummary();
+                });
+
+                document.getElementById('sendAmount').addEventListener('input', () => {
+                    this.validateAmount();
+                    this.updateSummary();
+                });
+
+                // Max button
+                document.getElementById('maxButton').addEventListener('click', () => {
+                    this.setMaxAmount();
+                });
+
+                // Fee options
+                document.querySelectorAll('.fee-option').forEach(option => {
+                    option.addEventListener('click', () => {
+                        this.selectFeeOption(option.dataset.speed);
+                    });
+                });
+
+                // Send button
+                document.getElementById('sendButton').addEventListener('click', () => {
+                    this.showConfirmation();
+                });
+
+                // Confirmation dialog
+                document.getElementById('cancelButton').addEventListener('click', () => {
+                    this.hideConfirmation();
+                });
+
+                document.getElementById('confirmButton').addEventListener('click', () => {
+                    this.sendTransaction();
+                });
+
+                // Recent addresses
+                document.querySelectorAll('.recent-address').forEach(addr => {
+                    addr.addEventListener('click', () => {
+                        const addressValue = addr.querySelector('.recent-address-value').textContent;
+                        document.getElementById('recipientAddress').value = addressValue;
+                        this.validateRecipient();
+                        this.updateSummary();
+                    });
+                });
+            }
+
+            async loadWalletData() {
+                try {
+                    // In real implementation, load from storage
+                    this.availableBalance = 1250.000000;
+                    document.getElementById('availableBalance').textContent = 
+                        this.availableBalance.toFixed(6) + ' SUNC';
+                } catch (error) {
+                    console.error('Failed to load wallet data:', error);
+                }
+            }
+
+            validateRecipient() {
+                const input = document.getElementById('recipientAddress');
+                const error = document.getElementById('recipientError');
+                const address = input.value.trim();
+
+                if (!address) {
+                    this.clearError('recipient');
+                    return false;
+                }
+
+                // Basic address validation
+                if (!address.startsWith('sunc1') || address.length < 39) {
+                    this.showError('recipient', 'Invalid Suncity address format');
+                    return false;
+                }
+
+                this.clearError('recipient');
+                return true;
+            }
+
+            validateAmount() {
+                const input = document.getElementById('sendAmount');
+                const error = document.getElementById('amountError');
+                const amount = parseFloat(input.value);
+
+                if (!input.value) {
+                    this.clearError('amount');
+                    return false;
+                }
+
+                if (isNaN(amount) || amount <= 0) {
+                    this.showError('amount', 'Amount must be greater than 0');
+                    return false;
+                }
+
+                if (amount < 0.000001) {
+                    this.showError('amount', 'Minimum amount is 0.000001 SUNC');
+                    return false;
+                }
+
+                const fee = this.feeAmounts[this.selectedFeeSpeed];
+                const total = amount + fee;
+
+                if (total > this.availableBalance) {
+                    this.showError('amount', 'Insufficient balance');
+                    return false;
+                }
+
+                this.clearError('amount');
+                return true;
+            }
+
+            showError(field, message) {
+                const input = document.getElementById(field === 'recipient' ? 'recipientAddress' : 'sendAmount');
+                const error = document.getElementById(field + 'Error');
+                
+                input.classList.add('error');
+                error.textContent = message;
+                error.classList.remove('hidden');
+            }
+
+            clearError(field) {
+                const input = document.getElementById(field === 'recipient' ? 'recipientAddress' : 'sendAmount');
+                const error = document.getElementById(field + 'Error');
+                
+                input.classList.remove('error');
+                error.classList.add('hidden');
+            }
+
+            setMaxAmount() {
+                const fee = this.feeAmounts[this.selectedFeeSpeed];
+                const maxAmount = Math.max(0, this.availableBalance - fee);
+                
+                document.getElementById('sendAmount').value = maxAmount.toFixed(6);
+                this.validateAmount();
+                this.updateSummary();
+            }
+
+            selectFeeOption(speed) {
+                // Update UI
+                document.querySelectorAll('.fee-option').forEach(option => {
+                    option.classList.remove('selected');
+                });
+                document.querySelector(`[data-speed="${speed}"]`).classList.add('selected');
+
+                this.selectedFeeSpeed = speed;
+                this.updateSummary();
+                this.validateAmount(); // Re-validate in case of insufficient funds
+            }
+
+            updateSummary() {
+                const amount = parseFloat(document.getElementById('sendAmount').value) || 0;
+                const fee = this.feeAmounts[this.selectedFeeSpeed];
+                const total = amount + fee;
+
+                document.getElementById('summaryAmount').textContent = amount.toFixed(6) + ' SUNC';
+                document.getElementById('summaryFee').textContent = fee.toFixed(6) + ' SUNC';
+                document.getElementById('summaryTotal').textContent = total.toFixed(6) + ' SUNC';
+
+                // Enable/disable send button
+                const isValid = this.validateRecipient() && this.validateAmount();
+                document.getElementById('sendButton').disabled = !isValid;
+            }
+
+            showConfirmation() {
+                const recipient = document.getElementById('recipientAddress').value;
+                const amount = parseFloat(document.getElementById('sendAmount').value);
+                const fee = this.feeAmounts[this.selectedFeeSpeed];
+                const total = amount + fee;
+
+                // Truncate address for display
+                const shortRecipient = recipient.slice(0, 10) + '...' + recipient.slice(-6);
+
+                document.getElementById('confirmRecipient').textContent = shortRecipient;
+                document.getElementById('confirmAmount').textContent = amount.toFixed(6) + ' SUNC';
+                document.getElementById('confirmFee').textContent = fee.toFixed(6) + ' SUNC';
+                document.getElementById('confirmTotal').textContent = total.toFixed(6) + ' SUNC';
+
+                document.getElementById('confirmationDialog').classList.remove('hidden');
+            }
+
+            hideConfirmation() {
+                document.getElementById('confirmationDialog').classList.add('hidden');
+            }
+
+            async sendTransaction() {
+                this.hideConfirmation();
+                document.getElementById('loadingOverlay').classList.remove('hidden');
+
+                try {
+                    const recipient = document.getElementById('recipientAddress').value;
+                    const amount = parseFloat(document.getElementById('sendAmount').value);
+                    const memo = document.getElementById('transactionMemo').value;
+
+                    // Mock transaction sending
+                    await new Promise(resolve => setTimeout(resolve, 3000));
+
+                    // Show success message
+                    this.showSuccessMessage();
+
+                    // Close window after short delay
+                    setTimeout(() => {
+                        window.close();
+                    }, 2000);
+
+                } catch (error) {
+                    console.error('Transaction failed:', error);
+                    this.showErrorMessage('Transaction failed: ' + error.message);
+                } finally {
+                    document.getElementById('loadingOverlay').classList.add('hidden');
+                }
+            }
+
+            showSuccessMessage() {
+                // Create success notification
+                const notification = document.createElement('div');
+                notification.className = 'notification success';
+                notification.textContent = 'Transaction sent successfully!';
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: #4CAF50;
+                    color: white;
+                    padding: 12px 16px;
+                    border-radius: 8px;
+                    font-weight: 500;
+                    z-index: 3000;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                `;
+                
+                document.body.appendChild(notification);
+                setTimeout(() => notification.remove(), 3000);
+            }
+
+            showErrorMessage(message) {
+                const notification = document.createElement('div');
+                notification.className = 'notification error';
+                notification.textContent = message;
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: #f44336;
+                    color: white;
+                    padding: 12px 16px;
+                    border-radius: 8px;
+                    font-weight: 500;
+                    z-index: 3000;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                `;
+                
+                document.body.appendChild(notification);
+                setTimeout(() => notification.remove(), 5000);
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new SendTokensHandler();
+        });
+    </script>
+</body>
+</html>

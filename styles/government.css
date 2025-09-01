@@ -1,0 +1,902 @@
+/* Republic of Suncity Wallet - Government Services Styles */
+
+/* Government Service Headers */
+.government-header {
+  padding: var(--spacing-xl);
+  color: white;
+  box-shadow: var(--shadow-md);
+  position: relative;
+  text-align: center;
+}
+
+.government-header.land {
+  background: linear-gradient(135deg, var(--land-color), var(--land-color-dark));
+}
+
+.government-header.citizen {
+  background: linear-gradient(135deg, var(--citizen-color), var(--citizen-color-dark));
+}
+
+.government-header.voting {
+  background: linear-gradient(135deg, var(--voting-color), var(--voting-color-dark));
+}
+
+.government-title {
+  font-size: var(--font-size-xxl);
+  font-weight: var(--font-weight-bold);
+  margin: 0 0 var(--spacing-sm) 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.government-subtitle {
+  font-size: var(--font-size-base);
+  opacity: 0.9;
+  font-weight: var(--font-weight-medium);
+}
+
+/* Government Service Cards */
+.service-grid {
+  display: grid;
+  gap: var(--spacing-md);
+  padding: var(--spacing-xl);
+}
+
+.service-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: var(--border-radius-xl);
+  padding: var(--spacing-lg);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  border: 1px solid var(--border-color);
+  position: relative;
+  overflow: hidden;
+}
+
+.service-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  transition: all var(--transition-normal);
+}
+
+.service-card.land::before {
+  background: linear-gradient(90deg, var(--land-color), var(--land-color-dark));
+}
+
+.service-card.citizen::before {
+  background: linear-gradient(90deg, var(--citizen-color), var(--citizen-color-dark));
+}
+
+.service-card.voting::before {
+  background: linear-gradient(90deg, var(--voting-color), var(--voting-color-dark));
+}
+
+.service-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.service-card:hover::before {
+  height: 6px;
+}
+
+.service-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--border-radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin-bottom: var(--spacing-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.service-icon.land {
+  background: linear-gradient(135deg, var(--land-color), var(--land-color-dark));
+  color: white;
+}
+
+.service-icon.citizen {
+  background: linear-gradient(135deg, var(--citizen-color), var(--citizen-color-dark));
+  color: white;
+}
+
+.service-icon.voting {
+  background: linear-gradient(135deg, var(--voting-color), var(--voting-color-dark));
+  color: white;
+}
+
+.service-title {
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--spacing-sm);
+  color: var(--text-primary);
+  font-size: var(--font-size-xl);
+}
+
+.service-description {
+  font-size: var(--font-size-md);
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: var(--spacing-md);
+}
+
+.service-status {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.service-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--border-radius-round);
+}
+
+.service-status-dot.active {
+  background: var(--success-color);
+}
+
+.service-status-dot.inactive {
+  background: var(--text-muted);
+}
+
+.service-status-dot.maintenance {
+  background: var(--warning-color);
+}
+
+/* Property/Land Registration Styles */
+.property-grid {
+  display: grid;
+  gap: var(--spacing-md);
+}
+
+.property-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: var(--border-radius-xl);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+  border: 1px solid var(--border-color);
+  transition: all var(--transition-normal);
+  position: relative;
+}
+
+.property-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--land-color);
+}
+
+.property-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-md);
+}
+
+.property-id {
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-xl);
+  color: var(--land-color);
+  margin: 0;
+}
+
+.property-status-badge {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-xl);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.property-status-badge.active {
+  background: var(--land-color-light);
+  color: var(--land-color);
+}
+
+.property-status-badge.pending {
+  background: rgba(255, 152, 0, 0.1);
+  color: var(--warning-color);
+}
+
+.property-status-badge.disputed {
+  background: rgba(244, 67, 54, 0.1);
+  color: var(--error-color);
+}
+
+.property-details {
+  display: grid;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+}
+
+.property-detail {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--font-size-md);
+  padding: var(--spacing-xs) 0;
+}
+
+.property-detail-label {
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-medium);
+  flex-shrink: 0;
+  margin-right: var(--spacing-md);
+}
+
+.property-detail-value {
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  text-align: right;
+  word-break: break-word;
+}
+
+.property-location {
+  font-size: var(--font-size-lg);
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.property-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-lg);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--border-color-light);
+}
+
+.property-action-btn {
+  flex: 1;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--border-color);
+  background: white;
+  color: var(--text-secondary);
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  font-weight: var(--font-weight-medium);
+}
+
+.property-action-btn:hover {
+  background: var(--background-secondary);
+  border-color: var(--land-color);
+  color: var(--land-color);
+}
+
+/* Citizen Registration Styles */
+.citizen-profile-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: var(--border-radius-xl);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-lg);
+  border: 1px solid var(--border-color);
+  position: relative;
+}
+
+.citizen-profile-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--citizen-color), var(--citizen-color-dark));
+}
+
+.citizen-id-badge {
+  position: absolute;
+  top: var(--spacing-lg);
+  right: var(--spacing-lg);
+  background: var(--citizen-color);
+  color: white;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-xl);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.citizen-profile-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.citizen-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--border-radius-round);
+  background: linear-gradient(135deg, var(--citizen-color), var(--citizen-color-dark));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  color: white;
+  margin-right: var(--spacing-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.citizen-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.citizen-name {
+  font-size: var(--font-size-xxl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.citizen-address {
+  font-family: 'Monaco', 'Menlo', monospace;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.citizen-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.citizen-detail-item {
+  background: var(--citizen-color-light);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-md);
+}
+
+.citizen-detail-label {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--spacing-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.citizen-detail-value {
+  font-size: var(--font-size-md);
+  color: var(--text-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* Voting/Proposal Styles */
+.proposal-grid {
+  display: grid;
+  gap: var(--spacing-lg);
+}
+
+.proposal-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: var(--border-radius-xl);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-lg);
+  border: 1px solid var(--border-color);
+  transition: all var(--transition-normal);
+  position: relative;
+}
+
+.proposal-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.proposal-card.voted {
+  opacity: 0.9;
+  border-color: var(--voting-color);
+}
+
+.proposal-status-badge {
+  position: absolute;
+  top: var(--spacing-lg);
+  right: var(--spacing-lg);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-xl);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+}
+
+.proposal-status-badge.active {
+  background: rgba(76, 175, 80, 0.1);
+  color: var(--success-color);
+}
+
+.proposal-status-badge.passed {
+  background: rgba(33, 150, 243, 0.1);
+  color: var(--info-color);
+}
+
+.proposal-status-badge.rejected {
+  background: rgba(244, 67, 54, 0.1);
+  color: var(--error-color);
+}
+
+.proposal-status-badge.expired {
+  background: rgba(158, 158, 158, 0.1);
+  color: var(--text-muted);
+}
+
+.proposal-header {
+  margin-bottom: var(--spacing-lg);
+  padding-right: 80px;
+}
+
+.proposal-title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+  line-height: 1.3;
+}
+
+.proposal-meta {
+  display: flex;
+  gap: var(--spacing-lg);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-medium);
+}
+
+.proposal-description {
+  color: var(--text-secondary);
+  font-size: var(--font-size-lg);
+  line-height: 1.6;
+  margin-bottom: var(--spacing-lg);
+}
+
+.voting-progress {
+  margin-bottom: var(--spacing-lg);
+}
+
+.progress-section {
+  margin-bottom: var(--spacing-md);
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+}
+
+.progress-label {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.progress-stats {
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.voting-progress-bar {
+  height: 8px;
+  background: var(--background-tertiary);
+  border-radius: var(--border-radius-sm);
+  overflow: hidden;
+  margin-bottom: var(--spacing-sm);
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: var(--border-radius-sm);
+  transition: width var(--transition-normal);
+}
+
+.progress-fill.for {
+  background: linear-gradient(90deg, var(--success-color) 0%, #66BB6A 100%);
+}
+
+.progress-fill.against {
+  background: linear-gradient(90deg, var(--error-color) 0%, #EF5350 100%);
+}
+
+.vote-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.vote-button {
+  padding: var(--spacing-md) var(--spacing-lg);
+  border: none;
+  border-radius: var(--border-radius-lg);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.vote-button.vote-yes {
+  background: var(--success-color);
+  color: white;
+}
+
+.vote-button.vote-yes:hover:not(:disabled) {
+  background: #45a049;
+  transform: translateY(-1px);
+}
+
+.vote-button.vote-no {
+  background: var(--error-color);
+  color: white;
+}
+
+.vote-button.vote-no:hover:not(:disabled) {
+  background: #da190b;
+  transform: translateY(-1px);
+}
+
+.vote-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.proposal-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--border-color-light);
+}
+
+.time-remaining {
+  font-weight: var(--font-weight-semibold);
+}
+
+.time-remaining.urgent {
+  color: var(--error-color);
+}
+
+.voted-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  color: var(--success-color);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* Government Fee Information */
+.gov-fee-info {
+  background: rgba(255, 193, 7, 0.1);
+  border: 1px solid #FFC107;
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  margin: var(--spacing-lg) 0;
+}
+
+.gov-fee-title {
+  font-weight: var(--font-weight-semibold);
+  color: #F57F17;
+  margin-bottom: var(--spacing-xs);
+  font-size: var(--font-size-lg);
+}
+
+.gov-fee-text {
+  font-size: var(--font-size-md);
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.gov-fee-breakdown {
+  margin-top: var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+
+/* Search and Filter for Government Services */
+.gov-search-container {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: var(--border-radius-xl);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+  border: 1px solid var(--border-color);
+}
+
+.gov-search-input {
+  width: 100%;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border: 2px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--spacing-md);
+  background: white;
+}
+
+.gov-filters {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.gov-filter-chip {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--border-color);
+  background: white;
+  border-radius: var(--border-radius-xxl);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  white-space: nowrap;
+  font-weight: var(--font-weight-medium);
+}
+
+.gov-filter-chip.active {
+  background: var(--voting-color);
+  color: white;
+  border-color: var(--voting-color);
+}
+
+.gov-filter-chip:hover:not(.active) {
+  border-color: var(--voting-color);
+  background: var(--voting-color-light);
+}
+
+/* Government Service Statistics */
+.gov-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--spacing-md);
+  margin: var(--spacing-xl) 0;
+}
+
+.gov-stat-card {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: var(--border-radius-xl);
+  padding: var(--spacing-lg);
+  text-align: center;
+  border: 1px solid var(--border-color);
+  transition: all var(--transition-normal);
+}
+
+.gov-stat-card:hover {
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+.gov-stat-value {
+  font-size: var(--font-size-xxl);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--spacing-xs);
+}
+
+.gov-stat-value.land {
+  color: var(--land-color);
+}
+
+.gov-stat-value.citizen {
+  color: var(--citizen-color);
+}
+
+.gov-stat-value.voting {
+  color: var(--voting-color);
+}
+
+.gov-stat-label {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Government Action Buttons */
+.gov-action-btn {
+  background: var(--voting-color);
+  color: white;
+  border: none;
+  padding: var(--spacing-md) var(--spacing-xl);
+  border-radius: var(--border-radius-lg);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  box-shadow: var(--shadow-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.gov-action-btn:hover:not(:disabled) {
+  background: var(--voting-color-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.gov-action-btn.land {
+  background: var(--land-color);
+}
+
+.gov-action-btn.land:hover:not(:disabled) {
+  background: var(--land-color-dark);
+}
+
+.gov-action-btn.citizen {
+  background: var(--citizen-color);
+}
+
+.gov-action-btn.citizen:hover:not(:disabled) {
+  background: var(--citizen-color-dark);
+}
+
+/* Government Form Styles */
+.gov-form {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: var(--border-radius-xl);
+  padding: var(--spacing-xl);
+  border: 1px solid var(--border-color);
+}
+
+.gov-form-section {
+  margin-bottom: var(--spacing-lg);
+}
+
+.gov-form-label {
+  display: block;
+  margin-bottom: var(--spacing-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  font-size: var(--font-size-lg);
+}
+
+.gov-form-input {
+  width: 100%;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border: 2px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-lg);
+  transition: border-color var(--transition-normal);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.gov-form-input:focus {
+  outline: none;
+  border-color: var(--voting-color);
+}
+
+.gov-form-input.error {
+  border-color: var(--error-color);
+}
+
+.gov-form-helper {
+  margin-top: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.gov-form-error {
+  margin-top: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  color: var(--error-color);
+  line-height: 1.4;
+}
+
+/* Responsive Adjustments for Government Services */
+@media (max-width: 400px) {
+  .citizen-details-grid,
+  .property-details {
+    grid-template-columns: 1fr;
+  }
+  
+  .vote-actions {
+    grid-template-columns: 1fr;
+  }
+  
+  .gov-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Animation for Government Services */
+.gov-fade-in {
+  animation: govFadeIn 0.5s ease-in-out;
+}
+
+@keyframes govFadeIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+.gov-slide-in {
+  animation: govSlideIn 0.4s ease-out;
+}
+
+@keyframes govSlideIn {
+  from { 
+    opacity: 0; 
+    transform: translateX(-30px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateX(0); 
+  }
+}
+
+/* Government Service Loading States */
+.gov-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xxl);
+  color: var(--text-secondary);
+}
+
+.gov-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border-color);
+  border-radius: var(--border-radius-round);
+  animation: spin 1s linear infinite;
+  margin-right: var(--spacing-md);
+}
+
+.gov-spinner.land {
+  border-top: 3px solid var(--land-color);
+}
+
+.gov-spinner.citizen {
+  border-top: 3px solid var(--citizen-color);
+}
+
+.gov-spinner.voting {
+  border-top: 3px solid var(--voting-color);
+}
+
+/* Government Success States */
+.gov-success-message {
+  background: rgba(76, 175, 80, 0.1);
+  border: 1px solid var(--success-color);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  text-align: center;
+  margin: var(--spacing-lg) 0;
+}
+
+.gov-success-icon {
+  font-size: 32px;
+  margin-bottom: var(--spacing-sm);
+  color: var(--success-color);
+}
+
+.gov-success-title {
+  font-weight: var(--font-weight-bold);
+  color: var(--success-color);
+  margin-bottom: var(--spacing-xs);
+}
+
+.gov-success-text {
+  font-size: var(--font-size-md);
+  color: var(--text-secondary);
+}

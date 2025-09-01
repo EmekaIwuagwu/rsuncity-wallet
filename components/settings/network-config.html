@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Configuration - Republic of Suncity Wallet</title>
+    <link rel="stylesheet" href="../../popup/popup.css">
+    <link rel="stylesheet" href="../../styles/components.css">
+    <style>
+        body {
+            width: 400px;
+            height: 600px;
+            margin: 0;
+            font-family: 'Inter', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #87CEEB 0%, #b8dcf0 100%);
+        }
+
+        .network-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .network-header {
+            background: #87CEEB;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .back-button {
+            position: absolute;
+            left: 15px;
+            top: 20px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #1a1a1a;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .network-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin: 0;
+        }
+
+        .network-subtitle {
+            font-size: 12px;
+            color: #555;
+            margin-top: 4px;
+        }
+
+        .network-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .network-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid #e0e6ed;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .section-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .section-icon {
+            font-size: 20px;
+            margin-right: 12px;
+            color: #87CEEB;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f8f9fa;
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid #e9ecef;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4CAF50;
+        }
+
+        .status-dot.connecting {
+            background: #FF9800;
+            animation: pulse 1.5s ease-in-out infinite alternate;
+        }
+
+        .status-dot.disconnected {
+            background: #f44336;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+
+        .status-text {
+            font-size: 12px;
+            font-weight: 500;
+            color: #1a1a1a;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1a1a1a;
+            font-size: 14px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e6ed;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+            background: rgba(255, 255, 255, 0.95);
+            font-family: 'Monaco', 'Menlo', monospace;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #87CEEB;
+        }
+
+        .form-input.error {
+            border-color: #f44336;
+        }
+
+        .form-input.success {
+            border-color: #4CAF50;
+        }
+
+        .input-helper {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 6px;
+            line-height: 1.4;
+        }
+
+        .input-error {
+            font-size: 12px;
+            color: #f44336;
+            margin-top: 6px;
+            line-height: 1.4;
+        }
+
+        .input-success {
+            font-size: 12px;
+            color: #4CAF50;
+            margin-top: 6px;
+            line-height: 1.4;
+        }
+
+        .network-preset {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .preset-option {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .preset-option:hover {
+            border-color: #87CEEB;
+            background: rgba(255, 255, 255, 1);
+        }
+
+        .preset-option.selected {
+            border-color: #87CEEB;
+            background: rgba(135, 206, 235, 0.1);
+        }
+
+        .preset-radio {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ddd;
+            border-radius: 50%;
+            margin-right: 12px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .preset-option.selected .preset-radio {
+            border-color: #87CEEB;
+        }
+
+        .preset-option.selected .preset-radio::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px;
+            height: 10px;
+            background: #87CEEB;
+            border-radius: 50%;
+        }
+
+        .preset-info {
+            flex: 1;
+        }
+
+        .preset-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+
+        .preset-description {
+            font-size: 12px;
+            color: #6c757d;
+            line-height: 1.4;
+        }
+
+        .preset-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: 12px;
+        }
+
+        .response-time {
+            font-size: 11px;
+            color: #6c757d;
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .custom-config {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+            border: 1px solid #e9ecef;
+        }
+
+        .custom-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+        }
+
+        .endpoint-test {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .test-button {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .test-button:hover {
+            background: #5a6268;
+        }
+
+        .test-button.testing {
+            background: #FF9800;
+            cursor: not-allowed;
+        }
+
+        .test-button.success {
+            background: #4CAF50;
+        }
+
+        .test-button.error {
+            background: #f44336;
+        }
+
+        .test-results {
+            margin-top: 12px;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .test-results.success {
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid #4CAF50;
+            color: #2e7d32;
+        }
+
+        .test-results.error {
+            background: rgba(244, 67, 54, 0.1);
+            border: 1px solid #f44336;
+            color: #c62828;
+        }
+
+        .chain-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .info-item {
+            text-align: center;
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .info-label {
+            font-size: 11px;
+            color: #6c757d;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1a1a1a;
+            font-family: 'Monaco', 'Menlo', monospace;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-primary {
+            background: #87CEEB;
+            color: #1a1a1a;
+            box-shadow: 0 2px 8px rgba(135, 206, 235, 0.3);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #6bb6ff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(135, 206, 235, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #5a6268;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.4);
+        }
+
+        .warning-box {
+            background: rgba(255, 152, 0, 0.1);
+            border: 1px solid #FF9800;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+
+        .warning-content {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .warning-icon {
+            font-size: 16px;
+            color: #f57c00;
+            margin-top: 1px;
+        }
+
+        .warning-text {
+            flex: 1;
+            font-size: 12px;
+            color: #6c757d;
+            line-height: 1.4;
+        }
+
+        .advanced-options {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .advanced-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .collapse-icon {
+            font-size: 12px;
+            color: #6c757d;
+            transition: transform 0.3s ease;
+        }
+
+        .advanced-content {
+            display: none;
+        }
+
+        .advanced-content.show {
+            display: block;
+        }
+
+        .advanced-options.expanded .collapse-icon {
+            transform: rotate(180deg);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 2000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .notification.success {
+            background: #4CAF50;
+        }
+
+        .notification.error {
+            background: #f44336;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e0e6ed;
+            border-top: 4px solid #87CEEB;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="network-container">
+        <div class="network-header">
+            <button class="back-button" id="backButton">←</button>
+            <div class="network-title">Network Configuration</div>
+            <div class="network-subtitle">Manage blockchain connections</div>
+        </div>
+
+        <div class="network-content">
+            <!-- Current Network Status -->
+            <div class="network-section">
+                <div class="section-header">
+                    <div class="section-info">
+                        <div class="section-icon">🌐</div>
+                        <div class="section-title">Current Network</div>
+                    </div>
+                    <div class="connection-status">
+                        <div class="status-dot" id="currentStatusDot"></div>
+                        <div class="status-text" id="currentStatusText">Connected</div>
+                    </div>
+                </div>
+
+                <div class="chain-info">
+                    <div class="info-item">
+                        <div class="info-label">Chain ID</div>
+                        <div class="info-value" id="currentChainId">rsuncitychain</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Block Height</div>
+                        <div class="info-value" id="currentBlockHeight">234,567</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">RPC Endpoint</div>
+                        <div class="info-value" id="currentRpcUrl">localhost:26657</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">API Endpoint</div>
+                        <div class="info-value" id="currentApiUrl">localhost:1317</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Network Presets -->
+            <div class="network-section">
+                <div class="section-header">
+                    <div class="section-info">
+                        <div class="section-icon">⚙️</div>
+                        <div class="section-title">Network Presets</div>
+                    </div>
+                </div>
+
+                <div class="network-preset">
+                    <div class="preset-option selected" data-network="mainnet">
+                        <div class="preset-radio"></div>
+                        <div class="preset-info">
+                            <div class="preset-title">Republic of Suncity Mainnet</div>
+                            <div class="preset-description">Official production network</div>
+                        </div>
+                        <div class="preset-status">
+                            <div class="status-dot"></div>
+                            <div class="response-time">45ms</div>
+                        </div>
+                    </div>
+
+                    <div class="preset-option" data-network="testnet">
+                        <div class="preset-radio"></div>
+                        <div class="preset-info">
+                            <div class="preset-title">Suncity Testnet</div>
+                            <div class="preset-description">Testing network for development</div>
+                        </div>
+                        <div class="preset-status">
+                            <div class="status-dot"></div>
+                            <div class="response-time">78ms</div>
+                        </div>
+                    </div>
+
+                    <div class="preset-option" data-network="local">
+                        <div class="preset-radio"></div>
+                        <div class="preset-info">
+                            <div class="preset-title">Local Development</div>
+                            <div class="preset-description">Local blockchain for development</div>
+                        </div>
+                        <div class="preset-status">
+                            <div class="status-dot"></div>
+                            <div class="response-time">12ms</div>
+                        </div>
+                    </div>
+
+                    <div class="preset-option" data-network="custom">
+                        <div class="preset-radio"></div>
+                        <div class="preset-info">
+                            <div class="preset-title">Custom Network</div>
+                            <div class="preset-description">Configure custom endpoints</div>
+                        </div>
+                        <div class="preset-status">
+                            <div class="status-dot disconnected"></div>
+                            <div class="response-time">--</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Custom Network Configuration -->
+            <div class="network-section" id="customNetworkSection">
+                <div class="section-header">
+                    <div class="section-info">
+                        <div class="section-icon">🔧</div>
+                        <div class="section-title">Custom Network</div>
+                    </div>
+                </div>
+
+                <div class="warning-box">
+                    <div class="warning-content">
+                        <div class="warning-icon">⚠️</div>
+                        <div class="warning-text">
+                            Only connect to trusted networks. Malicious networks can steal your funds or personal information.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="custom-config">
+                    <div class="custom-title">Network Details</div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="customChainId">Chain ID</label>
+                        <input type="text" id="customChainId" class="form-input" placeholder="rsuncitychain" value="rsuncitychain">
+                        <div class="input-helper">Unique identifier for the blockchain network</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="customChainName">Chain Name</label>
+                        <input type="text" id="customChainName" class="form-input" placeholder="Republic of Suncity" value="Republic of Suncity">
+                        <div class="input-helper">Human-readable name for the network</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="customRpcUrl">RPC Endpoint</label>
+                        <input type="url" id="customRpcUrl" class="form-input" placeholder="http://localhost:26657">
+                        <div class="endpoint-test">
+                            <button class="test-button" id="testRpc">Test Connection</button>
+                        </div>
+                        <div class="input-helper">Tendermint RPC endpoint for blockchain communication</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="customApiUrl">API Endpoint</label>
+                        <input type="url" id="customApiUrl" class="form-input" placeholder="http://localhost:1317">
+                        <div class="endpoint-test">
+                            <button class="test-button" id="testApi">Test Connection</button>
+                        </div>
+                        <div class="input-helper">REST API endpoint for querying blockchain data</div>
+                    </div>
+
+                    <div id="testResults" class="test-results hidden">
+                        <div id="testResultsContent"></div>
+                    </div>
+                </div>
+
+                <!-- Advanced Options -->
+                <div class="advanced-options" id="advancedOptions">
+                    <div class="advanced-title" id="advancedToggle">
+                        Advanced Settings
+                        <span class="collapse-icon">▼</span>
+                    </div>
+                    <div class="advanced-content" id="advancedContent">
+                        <div class="form-group">
+                            <label class="form-label" for="addressPrefix">Address Prefix</label>
+                            <input type="text" id="addressPrefix" class="form-input" placeholder="sunc" value="sunc">
+                            <div class="input-helper">Bech32 prefix for wallet addresses</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="coinDenom">Coin Denomination</label>
+                            <input type="text" id="coinDenom" class="form-input" placeholder="SUNC" value="SUNC">
+                            <div class="input-helper">Display name for the native token</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="coinDecimals">Coin Decimals</label>
+                            <input type="number" id="coinDecimals" class="form-input" placeholder="6" value="6" min="0" max="18">
+                            <div class="input-helper">Number of decimal places for the token</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="gasPrice">Default Gas Price</label>
+                            <input type="number" id="gasPrice" class="form-input" placeholder="0.025" value="0.025" step="0.001">
+                            <div class="input-helper">Default gas price in native tokens</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons" style="padding: 20px; background: rgba(255,255,255,0.95); border-top: 1px solid #e9ecef;">
+            <button class="btn btn-secondary" id="resetToDefault">
+                Reset to Default
+            </button>
+            <button class="btn btn-primary" id="saveNetworkConfig">
+                <span>💾</span>
+                Save & Connect
+            </button>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div class="loading-overlay hidden" id="loadingOverlay">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Connecting to network...</div>
+        </div>
+    </div>
+
+    <script>
+        class NetworkConfigHandler {
+            constructor() {
+                this.selectedNetwork = 'mainnet';
+                this.customConfig = {
+                    chainId: 'rsuncitychain',
+                    chainName: 'Republic of Suncity',
+                    rpc: '',
+                    rest: '',
+                    bech32Prefix: 'sunc',
+                    coinDenom: 'SUNC',
+                    coinDecimals: 6,
+                    gasPrice: 0.025
+                };
+                
+                this.networkPresets = {
+                    mainnet: {
+                        chainId: 'rsuncitychain',
+                        chainName: 'Republic of Suncity',
+                        rpc: 'https://rpc.suncity.gov:26657',
+                        rest: 'https://api.suncity.gov:1317'
+                    },
+                    testnet: {
+                        chainId: 'rsuncity-testnet',
+                        chainName: 'Suncity Testnet',
+                        rpc: 'https://testnet-rpc.suncity.gov:26657',
+                        rest: 'https://testnet-api.suncity.gov:1317'
+                    },
+                    local: {
+                        chainId: 'rsuncity-local',
+                        chainName: 'Local Suncity',
+                        rpc: 'http://localhost:26657',
+                        rest: 'http://localhost:1317'
+                    }
+                };
+                
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.loadCurrentNetwork();
+                this.updateNetworkStatus();
+            }
+
+            setupEventListeners() {
+                // Back button
+                document.getElementById('backButton').addEventListener('click', () => {
+                    window.close();
+                });
+
+                // Network preset selection
+                document.querySelectorAll('.preset-option').forEach(option => {
+                    option.addEventListener('click', (e) => {
+                        this.selectNetworkPreset(e.currentTarget.dataset.network);
+                    });
+                });
+
+                // Custom network form inputs
+                document.getElementById('customRpcUrl').addEventListener('input', this.validateCustomInputs.bind(this));
+                document.getElementById('customApiUrl').addEventListener('input', this.validateCustomInputs.bind(this));
+
+                // Test connection buttons
+                document.getElementById('testRpc').addEventListener('click', () => {
+                    this.testConnection('rpc');
+                });
+                document.getElementById('testApi').addEventListener('click', () => {
+                    this.testConnection('api');
+                });
+
+                // Advanced options toggle
+                document.getElementById('advancedToggle').addEventListener('click', () => {
+                    this.toggleAdvancedOptions();
+                });
+
+                // Action buttons
+                document.getElementById('resetToDefault').addEventListener('click', () => {
+                    this.resetToDefault();
+                });
+
+                document.getElementById('saveNetworkConfig').addEventListener('click', () => {
+                    this.saveAndConnect();
+                });
+
+                // Auto-hide custom section for non-custom networks
+                this.toggleCustomSection();
+            }
+
+            selectNetworkPreset(network) {
+                // Remove previous selections
+                document.querySelectorAll('.preset-option').forEach(option => {
+                    option.classList.remove('selected');
+                });
+
+                // Select new option
+                document.querySelector(`[data-network="${network}"]`).classList.add('selected');
+                
+                this.selectedNetwork = network;
+                this.toggleCustomSection();
+                
+                if (network !== 'custom') {
+                    this.loadPresetConfig(network);
+                }
+            }
+
+            toggleCustomSection() {
+                const customSection = document.getElementById('customNetworkSection');
+                if (this.selectedNetwork === 'custom') {
+                    customSection.style.display = 'block';
+                } else {
+                    customSection.style.display = 'none';
+                }
+            }
+
+            loadPresetConfig(network) {
+                const config = this.networkPresets[network];
+                if (config) {
+                    // Update current network display
+                    document.getElementById('currentChainId').textContent = config.chainId;
+                    document.getElementById('currentRpcUrl').textContent = config.rpc.replace('https://', '').replace('http://', '');
+                    document.getElementById('currentApiUrl').textContent = config.rest.replace('https://', '').replace('http://', '');
+                }
+            }
+
+            validateCustomInputs() {
+                const rpcUrl = document.getElementById('customRpcUrl').value;
+                const apiUrl = document.getElementById('customApiUrl').value;
+                
+                const rpcInput = document.getElementById('customRpcUrl');
+                const apiInput = document.getElementById('customApiUrl');
+                
+                // Basic URL validation
+                const isValidRpc = this.isValidUrl(rpcUrl);
+                const isValidApi = this.isValidUrl(apiUrl);
+                
+                // Update input styles
+                rpcInput.classList.toggle('error', rpcUrl && !isValidRpc);
+                rpcInput.classList.toggle('success', isValidRpc);
+                
+                apiInput.classList.toggle('error', apiUrl && !isValidApi);
+                apiInput.classList.toggle('success', isValidApi);
+                
+                // Enable save button if both URLs are valid
+                const saveButton = document.getElementById('saveNetworkConfig');
+                saveButton.disabled = this.selectedNetwork === 'custom' && !(isValidRpc && isValidApi);
+            }
+
+            isValidUrl(string) {
+                try {
+                    const url = new URL(string);
+                    return url.protocol === 'http:' || url.protocol === 'https:';
+                } catch (_) {
+                    return false;
+                }
+            }
+
+            async testConnection(type) {
+                const button = document.getElementById(type === 'rpc' ? 'testRpc' : 'testApi');
+                const url = document.getElementById(type === 'rpc' ? 'customRpcUrl' : 'customApiUrl').value;
+                
+                if (!url) {
+                    this.showNotification('Please enter a URL first', 'error');
+                    return;
+                }
+
+                // Update button state
+                button.textContent = 'Testing...';
+                button.classList.add('testing');
+                button.disabled = true;
+
+                try {
+                    const startTime = Date.now();
+                    
+                    // Test the connection
+                    const testEndpoint = type === 'rpc' ? '/status' : '/cosmos/base/tendermint/v1beta1/node_info';
+                    const response = await this.makeRequest(url + testEndpoint, { timeout: 5000 });
+                    
+                    const responseTime = Date.now() - startTime;
+                    
+                    // Show success
+                    button.textContent = 'Connected';
+                    button.classList.remove('testing');
+                    button.classList.add('success');
+                    
+                    this.showTestResults(`✅ Connection successful! Response time: ${responseTime}ms`, 'success');
+                    
+                } catch (error) {
+                    // Show error
+                    button.textContent = 'Failed';
+                    button.classList.remove('testing');
+                    button.classList.add('error');
+                    
+                    this.showTestResults(`❌ Connection failed: ${error.message}`, 'error');
+                }
+                
+                // Reset button after 3 seconds
+                setTimeout(() => {
+                    button.textContent = 'Test Connection';
+                    button.classList.remove('testing', 'success', 'error');
+                    button.disabled = false;
+                }, 3000);
+            }
+
+            async makeRequest(url, options = {}) {
+                const { timeout = 10000 } = options;
+                
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), timeout);
+                
+                try {
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        signal: controller.signal
+                    });
+                    
+                    clearTimeout(timeoutId);
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
+                    return await response.json();
+                } catch (error) {
+                    clearTimeout(timeoutId);
+                    if (error.name === 'AbortError') {
+                        throw new Error('Connection timeout');
+                    }
+                    throw error;
+                }
+            }
+
+            showTestResults(message, type) {
+                const resultsDiv = document.getElementById('testResults');
+                const contentDiv = document.getElementById('testResultsContent');
+                
+                contentDiv.textContent = message;
+                resultsDiv.className = `test-results ${type}`;
+                resultsDiv.classList.remove('hidden');
+                
+                // Auto-hide after 5 seconds
+                setTimeout(() => {
+                    resultsDiv.classList.add('hidden');
+                }, 5000);
+            }
+
+            toggleAdvancedOptions() {
+                const advancedOptions = document.getElementById('advancedOptions');
+                const advancedContent = document.getElementById('advancedContent');
+                
+                if (advancedContent.classList.contains('show')) {
+                    advancedContent.classList.remove('show');
+                    advancedOptions.classList.remove('expanded');
+                } else {
+                    advancedContent.classList.add('show');
+                    advancedOptions.classList.add('expanded');
+                }
+            }
+
+            loadCurrentNetwork() {
+                // Load current network configuration from storage
+                const stored = localStorage.getItem('suncityNetworkConfig');
+                if (stored) {
+                    try {
+                        const config = JSON.parse(stored);
+                        this.customConfig = { ...this.customConfig, ...config };
+                        
+                        // Update UI with stored config
+                        if (config.selectedNetwork) {
+                            this.selectNetworkPreset(config.selectedNetwork);
+                        }
+                        
+                        // Populate custom fields
+                        document.getElementById('customChainId').value = config.chainId || this.customConfig.chainId;
+                        document.getElementById('customChainName').value = config.chainName || this.customConfig.chainName;
+                        document.getElementById('customRpcUrl').value = config.rpc || '';
+                        document.getElementById('customApiUrl').value = config.rest || '';
+                        document.getElementById('addressPrefix').value = config.bech32Prefix || this.customConfig.bech32Prefix;
+                        document.getElementById('coinDenom').value = config.coinDenom || this.customConfig.coinDenom;
+                        document.getElementById('coinDecimals').value = config.coinDecimals || this.customConfig.coinDecimals;
+                        document.getElementById('gasPrice').value = config.gasPrice || this.customConfig.gasPrice;
+                        
+                    } catch (error) {
+                        console.error('Failed to load network config:', error);
+                    }
+                }
+            }
+
+            async updateNetworkStatus() {
+                const statusDot = document.getElementById('currentStatusDot');
+                const statusText = document.getElementById('currentStatusText');
+                
+                try {
+                    // Mock network status check
+                    const isConnected = Math.random() > 0.1; // 90% chance connected
+                    
+                    if (isConnected) {
+                        statusDot.classList.remove('disconnected', 'connecting');
+                        statusText.textContent = 'Connected';
+                        
+                        // Mock block height update
+                        const blockHeight = Math.floor(Math.random() * 1000) + 234000;
+                        document.getElementById('currentBlockHeight').textContent = blockHeight.toLocaleString();
+                    } else {
+                        statusDot.classList.add('disconnected');
+                        statusDot.classList.remove('connecting');
+                        statusText.textContent = 'Disconnected';
+                    }
+                } catch (error) {
+                    statusDot.classList.add('disconnected');
+                    statusText.textContent = 'Error';
+                }
+                
+                // Update every 10 seconds
+                setTimeout(() => this.updateNetworkStatus(), 10000);
+            }
+
+            resetToDefault() {
+                this.selectNetworkPreset('mainnet');
+                
+                // Reset custom form
+                document.getElementById('customChainId').value = 'rsuncitychain';
+                document.getElementById('customChainName').value = 'Republic of Suncity';
+                document.getElementById('customRpcUrl').value = '';
+                document.getElementById('customApiUrl').value = '';
+                document.getElementById('addressPrefix').value = 'sunc';
+                document.getElementById('coinDenom').value = 'SUNC';
+                document.getElementById('coinDecimals').value = '6';
+                document.getElementById('gasPrice').value = '0.025';
+                
+                this.showNotification('Network configuration reset to default', 'success');
+            }
+
+            async saveAndConnect() {
+                document.getElementById('loadingOverlay').classList.remove('hidden');
+                
+                try {
+                    let config;
+                    
+                    if (this.selectedNetwork === 'custom') {
+                        // Validate custom inputs
+                        const rpcUrl = document.getElementById('customRpcUrl').value;
+                        const apiUrl = document.getElementById('customApiUrl').value;
+                        
+                        if (!this.isValidUrl(rpcUrl) || !this.isValidUrl(apiUrl)) {
+                            throw new Error('Please enter valid RPC and API URLs');
+                        }
+                        
+                        // Build custom config
+                        config = {
+                            selectedNetwork: 'custom',
+                            chainId: document.getElementById('customChainId').value,
+                            chainName: document.getElementById('customChainName').value,
+                            rpc: rpcUrl,
+                            rest: apiUrl,
+                            bech32Prefix: document.getElementById('addressPrefix').value,
+                            coinDenom: document.getElementById('coinDenom').value,
+                            coinDecimals: parseInt(document.getElementById('coinDecimals').value),
+                            gasPrice: parseFloat(document.getElementById('gasPrice').value)
+                        };
+                    } else {
+                        // Use preset config
+                        config = {
+                            selectedNetwork: this.selectedNetwork,
+                            ...this.networkPresets[this.selectedNetwork]
+                        };
+                    }
+                    
+                    // Simulate connection attempt
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    
+                    // Save configuration
+                    localStorage.setItem('suncityNetworkConfig', JSON.stringify(config));
+                    
+                    // Update current network display
+                    document.getElementById('currentChainId').textContent = config.chainId;
+                    document.getElementById('currentRpcUrl').textContent = config.rpc.replace('https://', '').replace('http://', '');
+                    document.getElementById('currentApiUrl').textContent = config.rest.replace('https://', '').replace('http://', '');
+                    
+                    this.showNotification('Network configuration saved and connected!', 'success');
+                    
+                } catch (error) {
+                    console.error('Failed to save network config:', error);
+                    this.showNotification(error.message, 'error');
+                } finally {
+                    document.getElementById('loadingOverlay').classList.add('hidden');
+                }
+            }
+
+            showNotification(message, type = 'success') {
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.textContent = message;
+                
+                document.body.appendChild(notification);
+                setTimeout(() => notification.remove(), 3000);
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new NetworkConfigHandler();
+        });
+    </script>
+</body>
+</html>

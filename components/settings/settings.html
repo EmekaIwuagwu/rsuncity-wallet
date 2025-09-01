@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Republic of Suncity Wallet</title>
+    <link rel="stylesheet" href="../../popup/popup.css">
+    <link rel="stylesheet" href="../../styles/components.css">
+    <style>
+        body {
+            width: 400px;
+            height: 600px;
+            margin: 0;
+            font-family: 'Inter', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #87CEEB 0%, #b8dcf0 100%);
+        }
+
+        .settings-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .settings-header {
+            background: #87CEEB;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .back-button {
+            position: absolute;
+            left: 15px;
+            top: 20px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #1a1a1a;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .settings-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin: 0;
+        }
+
+        .settings-subtitle {
+            font-size: 12px;
+            color: #555;
+            margin-top: 4px;
+        }
+
+        .settings-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .settings-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid #e0e6ed;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .section-icon {
+            font-size: 20px;
+            margin-right: 12px;
+            color: #87CEEB;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .setting-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-info {
+            flex: 1;
+        }
+
+        .setting-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 2px;
+        }
+
+        .setting-description {
+            font-size: 12px;
+            color: #6c757d;
+            line-height: 1.3;
+        }
+
+        .setting-control {
+            margin-left: 12px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: #ccc;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            background: #87CEEB;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(20px);
+        }
+
+        .setting-button {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            color: #1a1a1a;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .setting-button:hover {
+            background: #e9ecef;
+        }
+
+        .setting-button.primary {
+            background: #87CEEB;
+            color: #1a1a1a;
+            border-color: #87CEEB;
+        }
+
+        .setting-button.primary:hover {
+            background: #6bb6ff;
+        }
+
+        .setting-button.danger {
+            background: #f8f9fa;
+            color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        .setting-button.danger:hover {
+            background: #dc3545;
+            color: white;
+        }
+
+        .select-dropdown {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 12px;
+            color: #1a1a1a;
+            min-width: 100px;
+            cursor: pointer;
+        }
+
+        .select-dropdown:focus {
+            outline: none;
+            border-color: #87CEEB;
+        }
+
+        .wallet-info {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid #e9ecef;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .info-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .info-value {
+            font-size: 12px;
+            color: #1a1a1a;
+            font-family: 'Monaco', 'Menlo', monospace;
+            word-break: break-all;
+        }
+
+        .copy-button {
+            background: #e9ecef;
+            border: none;
+            color: #6c757d;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            cursor: pointer;
+            margin-left: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .copy-button:hover {
+            background: #87CEEB;
+            color: #1a1a1a;
+        }
+
+        .network-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4CAF50;
+        }
+
+        .status-dot.disconnected {
+            background: #f44336;
+        }
+
+        .status-text {
+            font-size: 12px;
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+
+        .danger-zone {
+            background: rgba(220, 53, 69, 0.05);
+            border: 1px solid rgba(220, 53, 69, 0.2);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .danger-header {
+            font-size: 14px;
+            font-weight: 600;
+            color: #dc3545;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .danger-description {
+            font-size: 12px;
+            color: #6c757d;
+            line-height: 1.4;
+            margin-bottom: 12px;
+        }
+
+        .version-info {
+            text-align: center;
+            padding: 16px;
+            color: #6c757d;
+            font-size: 11px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .version-logo {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 320px;
+            width: 90%;
+            max-height: 80%;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .modal-description {
+            font-size: 14px;
+            color: #6c757d;
+            line-height: 1.4;
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e6ed;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 12px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #87CEEB;
+        }
+
+        .recovery-phrase {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 12px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 11px;
+            line-height: 1.4;
+            word-break: break-all;
+            margin-bottom: 12px;
+        }
+
+        .warning-box {
+            background: rgba(255, 152, 0, 0.1);
+            border: 1px solid #FF9800;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+
+        .warning-title {
+            font-weight: 600;
+            color: #f57c00;
+            font-size: 12px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .warning-text {
+            font-size: 11px;
+            color: #6c757d;
+            line-height: 1.4;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: #87CEEB;
+            color: #1a1a1a;
+        }
+
+        .btn-primary:hover {
+            background: #6bb6ff;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 2000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .notification.success {
+            background: #4CAF50;
+        }
+
+        .notification.error {
+            background: #f44336;
+        }
+    </style>
+</head>
+<body>
+    <div class="settings-container">
+        <div class="settings-header">
+            <button class="back-button" id="backButton">←</button>
+            <div class="settings-title">Wallet Settings</div>
+            <div class="settings-subtitle">Manage your Republic of Suncity Wallet</div>
+        </div>
+
+        <div class="settings-content">
+            <!-- Wallet Information -->
+            <div class="settings-section">
+                <div class="section-header">
+                    <div class="section-icon">👛</div>
+                    <div class="section-title">Wallet Information</div>
+                </div>
+                
+                <div class="wallet-info">
+                    <div class="info-row">
+                        <div class="info-label">Address:</div>
+                        <div class="info-value" id="walletAddress">
+                            sunc1qjsj8k2lm9xrtvn3p4k6j8h9g7f5d4c3b2a1z9x8y7w6v5
+                            <button class="copy-button" onclick="copyToClipboard('walletAddress')">Copy</button>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Network:</div>
+                        <div class="info-value">Republic of Suncity (rsuncitychain)</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Balance:</div>
+                        <div class="info-value" id="walletBalance">1,250.000000 SUNC</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Network & Connection -->
+            <div class="settings-section">
+                <div class="section-header">
+                    <div class="section-icon">🌐</div>
+                    <div class="section-title">Network & Connection</div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Network Status</div>
+                        <div class="setting-description">Connection to Republic of Suncity blockchain</div>
+                    </div>
+                    <div class="setting-control">
+                        <div class="network-status">
+                            <div class="status-dot" id="networkStatus"></div>
+                            <div class="status-text" id="networkStatusText">Connected</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Auto-connect</div>
+                        <div class="setting-description">Automatically connect to network on startup</div>
+                    </div>
+                    <div class="setting-control">
+                        <div class="toggle-switch active" id="autoConnectToggle">
+                            <div class="toggle-slider"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">RPC Endpoint</div>
+                        <div class="setting-description">Custom RPC server address</div>
+                    </div>
+                    <div class="setting-control">
+                        <button class="setting-button" id="configureRpc">Configure</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security Settings -->
+            <div class="settings-section">
+                <div class="section-header">
+                    <div class="section-icon">🔒</div>
+                    <div class="section-title">Security & Privacy</div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Auto-lock Timer</div>
+                        <div class="setting-description">Lock wallet after inactivity</div>
+                    </div>
+                    <div class="setting-control">
+                        <select class="select-dropdown" id="autoLockTimer">
+                            <option value="0">Never</option>
+                            <option value="5">5 minutes</option>
+                            <option value="15">15 minutes</option>
+                            <option value="30" selected>30 minutes</option>
+                            <option value="60">1 hour</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Change Password</div>
+                        <div class="setting-description">Update your wallet password</div>
+                    </div>
+                    <div class="setting-control">
+                        <button class="setting-button" id="changePassword">Change</button>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Show Recovery Phrase</div>
+                        <div class="setting-description">Display your 24-word recovery phrase</div>
+                    </div>
+                    <div class="setting-control">
+                        <button class="setting-button primary" id="showRecoveryPhrase">Show</button>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Privacy Mode</div>
+                        <div class="setting-description">Hide balance and transaction amounts</div>
+                    </div>
+                    <div class="setting-control">
+                        <div class="toggle-switch" id="privacyModeToggle">
+                            <div class="toggle-slider"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preferences -->
+            <div class="settings-section">
+                <div class="section-header">
+                    <div class="section-icon">⚙️</div>
+                    <div class="section-title">Preferences</div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Currency Display</div>
+                        <div class="setting-description">Primary currency for amounts</div>
+                    </div>
+                    <div class="setting-control">
+                        <select class="select-dropdown" id="currencyDisplay">
+                            <option value="SUNC" selected>SUNC</option>
+                            <option value="USD">USD</option>
+                            <option value="EUR">EUR</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Transaction Notifications</div>
+                        <div class="setting-description">Show notifications for transactions</div>
+                    </div>
+                    <div class="setting-control">
+                        <div class="toggle-switch active" id="notificationsToggle">
+                            <div class="toggle-slider"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Language</div>
+                        <div class="setting-description">Wallet interface language</div>
+                    </div>
+                    <div class="setting-control">
+                        <select class="select-dropdown" id="languageSelect">
+                            <option value="en" selected>English</option>
+                            <option value="es">Español</option>
+                            <option value="fr">Français</option>
+                            <option value="de">Deutsch</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Advanced Settings -->
+            <div class="settings-section">
+                <div class="section-header">
+                    <div class="section-icon">🔧</div>
+                    <div class="section-title">Advanced</div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Developer Mode</div>
+                        <div class="setting-description">Show advanced developer options</div>
+                    </div>
+                    <div class="setting-control">
+                        <div class="toggle-switch" id="developerModeToggle">
+                            <div class="toggle-slider"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Clear Cache</div>
+                        <div class="setting-description">Clear stored transaction history and cache</div>
+                    </div>
+                    <div class="setting-control">
+                        <button class="setting-button" id="clearCache">Clear</button>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Export Logs</div>
+                        <div class="setting-description">Download wallet logs for debugging</div>
+                    </div>
+                    <div class="setting-control">
+                        <button class="setting-button" id="exportLogs">Export</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Danger Zone -->
+            <div class="settings-section">
+                <div class="section-header">
+                    <div class="section-icon">⚠️</div>
+                    <div class="section-title">Danger Zone</div>
+                </div>
+                
+                <div class="danger-zone">
+                    <div class="danger-header">
+                        🚨 Reset Wallet
+                    </div>
+                    <div class="danger-description">
+                        This will completely remove your wallet from this device. Make sure you have your recovery phrase saved before proceeding.
+                    </div>
+                    <button class="setting-button danger" id="resetWallet">Reset Wallet</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Version Info -->
+        <div class="version-info">
+            <div class="version-logo">☀️</div>
+            <div>Republic of Suncity Wallet</div>
+            <div>Version 1.0.0 • Built with ❤️ for Suncity</div>
+        </div>
+
+        <!-- Recovery Phrase Modal -->
+        <div class="modal hidden" id="recoveryModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">Recovery Phrase</div>
+                    <div class="modal-description">Your 24-word recovery phrase</div>
+                </div>
+                <div class="modal-body">
+                    <div class="warning-box">
+                        <div class="warning-title">
+                            ⚠️ Keep This Safe
+                        </div>
+                        <div class="warning-text">
+                            Never share your recovery phrase. Anyone with these words can access your wallet and steal your funds.
+                        </div>
+                    </div>
+                    <div class="recovery-phrase" id="recoveryPhraseDisplay">
+                        Loading recovery phrase...
+                    </div>
+                    <input type="password" class="form-input" id="confirmPassword" placeholder="Enter password to confirm">
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" id="cancelRecovery">Cancel</button>
+                    <button class="btn btn-primary" id="confirmRecovery">Show Phrase</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reset Wallet Modal -->
+        <div class="modal hidden" id="resetModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">Reset Wallet</div>
+                    <div class="modal-description">This action cannot be undone</div>
+                </div>
+                <div class="modal-body">
+                    <div class="warning-box">
+                        <div class="warning-title">
+                            🚨 Final Warning
+                        </div>
+                        <div class="warning-text">
+                            You are about to permanently delete your wallet from this device. Make sure you have your recovery phrase saved safely.
+                        </div>
+                    </div>
+                    <p style="font-size: 14px; color: #6c757d; margin-bottom: 12px;">
+                        Type <strong>RESET</strong> to confirm:
+                    </p>
+                    <input type="text" class="form-input" id="resetConfirmation" placeholder="Type RESET to confirm">
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" id="cancelReset">Cancel</button>
+                    <button class="btn btn-danger" id="confirmReset" disabled>Reset Wallet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class SettingsHandler {
+            constructor() {
+                this.settings = {
+                    autoConnect: true,
+                    autoLockTimer: 30,
+                    privacyMode: false,
+                    currencyDisplay: 'SUNC',
+                    notifications: true,
+                    language: 'en',
+                    developerMode: false
+                };
+                
+                this.init();
+            }
+
+            init() {
+                this.loadSettings();
+                this.setupEventListeners();
+                this.checkNetworkStatus();
+            }
+
+            setupEventListeners() {
+                // Back button
+                document.getElementById('backButton').addEventListener('click', () => {
+                    window.close();
+                });
+
+                // Toggle switches
+                this.setupToggle('autoConnectToggle', 'autoConnect');
+                this.setupToggle('privacyModeToggle', 'privacyMode');
+                this.setupToggle('notificationsToggle', 'notifications');
+                this.setupToggle('developerModeToggle', 'developerMode');
+
+                // Dropdowns
+                document.getElementById('autoLockTimer').addEventListener('change', (e) => {
+                    this.settings.autoLockTimer = parseInt(e.target.value);
+                    this.saveSettings();
+                });
+
+                document.getElementById('currencyDisplay').addEventListener('change', (e) => {
+                    this.settings.currencyDisplay = e.target.value;
+                    this.saveSettings();
+                });
+
+                document.getElementById('languageSelect').addEventListener('change', (e) => {
+                    this.settings.language = e.target.value;
+                    this.saveSettings();
+                    this.showNotification('Language updated. Restart required.', 'success');
+                });
+
+                // Buttons
+                document.getElementById('configureRpc').addEventListener('click', () => {
+                    this.showNotification('RPC configuration coming soon!', 'success');
+                });
+
+                document.getElementById('changePassword').addEventListener('click', () => {
+                    this.showNotification('Password change coming soon!', 'success');
+                });
+
+                document.getElementById('showRecoveryPhrase').addEventListener('click', () => {
+                    document.getElementById('recoveryModal').classList.remove('hidden');
+                });
+
+                document.getElementById('clearCache').addEventListener('click', () => {
+                    this.clearCache();
+                });
+
+                document.getElementById('exportLogs').addEventListener('click', () => {
+                    this.exportLogs();
+                });
+
+                document.getElementById('resetWallet').addEventListener('click', () => {
+                    document.getElementById('resetModal').classList.remove('hidden');
+                });
+
+                // Modal handlers
+                this.setupRecoveryModal();
+                this.setupResetModal();
+
+                // Click outside to close modals
+                document.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('modal')) {
+                        e.target.classList.add('hidden');
+                    }
+                });
+            }
+
+            setupToggle(toggleId, settingKey) {
+                const toggle = document.getElementById(toggleId);
+                toggle.addEventListener('click', () => {
+                    this.settings[settingKey] = !this.settings[settingKey];
+                    this.updateToggle(toggleId, this.settings[settingKey]);
+                    this.saveSettings();
+                });
+                this.updateToggle(toggleId, this.settings[settingKey]);
+            }
+
+            updateToggle(toggleId, isActive) {
+                const toggle = document.getElementById(toggleId);
+                if (isActive) {
+                    toggle.classList.add('active');
+                } else {
+                    toggle.classList.remove('active');
+                }
+            }
+
+            setupRecoveryModal() {
+                document.getElementById('confirmRecovery').addEventListener('click', () => {
+                    const password = document.getElementById('confirmPassword').value;
+                    if (password) {
+                        this.showRecoveryPhrase();
+                    } else {
+                        this.showNotification('Please enter your password', 'error');
+                    }
+                });
+
+                document.getElementById('cancelRecovery').addEventListener('click', () => {
+                    document.getElementById('recoveryModal').classList.add('hidden');
+                    document.getElementById('confirmPassword').value = '';
+                });
+            }
+
+            setupResetModal() {
+                const resetInput = document.getElementById('resetConfirmation');
+                const confirmButton = document.getElementById('confirmReset');
+
+                resetInput.addEventListener('input', (e) => {
+                    confirmButton.disabled = e.target.value !== 'RESET';
+                });
+
+                confirmButton.addEventListener('click', () => {
+                    this.resetWallet();
+                });
+
+                document.getElementById('cancelReset').addEventListener('click', () => {
+                    document.getElementById('resetModal').classList.add('hidden');
+                    resetInput.value = '';
+                    confirmButton.disabled = true;
+                });
+            }
+
+            loadSettings() {
+                // Load settings from storage (mock implementation)
+                const stored = localStorage.getItem('suncityWalletSettings');
+                if (stored) {
+                    this.settings = { ...this.settings, ...JSON.parse(stored) };
+                }
+
+                // Update UI with loaded settings
+                document.getElementById('autoLockTimer').value = this.settings.autoLockTimer;
+                document.getElementById('currencyDisplay').value = this.settings.currencyDisplay;
+                document.getElementById('languageSelect').value = this.settings.language;
+            }
+
+            saveSettings() {
+                localStorage.setItem('suncityWalletSettings', JSON.stringify(this.settings));
+                this.showNotification('Settings saved', 'success');
+            }
+
+            async checkNetworkStatus() {
+                try {
+                    // Mock network check
+                    const isConnected = Math.random() > 0.1; // 90% chance connected
+                    
+                    const statusDot = document.getElementById('networkStatus');
+                    const statusText = document.getElementById('networkStatusText');
+                    
+                    if (isConnected) {
+                        statusDot.classList.remove('disconnected');
+                        statusText.textContent = 'Connected';
+                    } else {
+                        statusDot.classList.add('disconnected');
+                        statusText.textContent = 'Disconnected';
+                    }
+                } catch (error) {
+                    console.error('Network status check failed:', error);
+                }
+            }
+
+            showRecoveryPhrase() {
+                // Mock recovery phrase
+                const mockPhrase = 'abandon ability able about above absent absorb abstract absurd abuse access accident account accuse achieve acid acoustic acquire across act action actor actress actual';
+                document.getElementById('recoveryPhraseDisplay').textContent = mockPhrase;
+                
+                // Add copy button functionality
+                document.getElementById('recoveryPhraseDisplay').addEventListener('click', () => {
+                    navigator.clipboard.writeText(mockPhrase);
+                    this.showNotification('Recovery phrase copied to clipboard!', 'success');
+                });
+            }
+
+            clearCache() {
+                // Clear cached data
+                const keysToRemove = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key && key.includes('suncity') && !key.includes('Settings')) {
+                        keysToRemove.push(key);
+                    }
+                }
+                
+                keysToRemove.forEach(key => localStorage.removeItem(key));
+                this.showNotification(`Cleared ${keysToRemove.length} cached items`, 'success');
+            }
+
+            exportLogs() {
+                const logs = {
+                    timestamp: new Date().toISOString(),
+                    version: '1.0.0',
+                    network: 'rsuncitychain',
+                    settings: this.settings,
+                    userAgent: navigator.userAgent
+                };
+                
+                const dataStr = JSON.stringify(logs, null, 2);
+                const blob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `suncity-wallet-logs-${Date.now()}.json`;
+                a.click();
+                
+                URL.revokeObjectURL(url);
+                this.showNotification('Logs exported successfully', 'success');
+            }
+
+            resetWallet() {
+                // Clear all wallet data
+                localStorage.clear();
+                this.showNotification('Wallet reset successfully', 'success');
+                
+                setTimeout(() => {
+                    window.close();
+                }, 1500);
+            }
+
+            showNotification(message, type = 'success') {
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.textContent = message;
+                
+                document.body.appendChild(notification);
+                setTimeout(() => notification.remove(), 3000);
+            }
+        }
+
+        // Copy to clipboard functionality
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent.replace('Copy', '').trim();
+            navigator.clipboard.writeText(text).then(() => {
+                const handler = window.settingsHandler || new SettingsHandler();
+                handler.showNotification('Copied to clipboard!', 'success');
+            });
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            window.settingsHandler = new SettingsHandler();
+        });
+    </script>
+</body>
+</html>

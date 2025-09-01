@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cast Vote - Republic of Suncity</title>
+    <link rel="stylesheet" href="../../popup/popup.css">
+    <link rel="stylesheet" href="../../styles/components.css">
+    <link rel="stylesheet" href="../../styles/government.css">
+    <style>
+        body {
+            width: 400px;
+            height: 600px;
+            margin: 0;
+            font-family: 'Inter', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #87CEEB 0%, #b8dcf0 100%);
+        }
+
+        .vote-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .vote-header {
+            background: #87CEEB;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .back-button {
+            position: absolute;
+            left: 15px;
+            top: 20px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #1a1a1a;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .vote-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin: 0;
+        }
+
+        .vote-subtitle {
+            font-size: 12px;
+            color: #555;
+            margin-top: 4px;
+        }
+
+        .vote-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0;
+        }
+
+        .proposal-card {
+            background: rgba(255, 255, 255, 0.95);
+            margin: 20px;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e0e6ed;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .proposal-id {
+            background: #FFD700;
+            color: #1a1a1a;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 12px;
+        }
+
+        .proposal-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .proposal-description {
+            color: #6c757d;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .proposal-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .meta-item {
+            text-align: center;
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .meta-label {
+            font-size: 11px;
+            color: #6c757d;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .meta-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .vote-stats {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stats-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+        }
+
+        .vote-bar {
+            background: #e9ecef;
+            border-radius: 4px;
+            height: 6px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+
+        .vote-progress {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .vote-progress.yes {
+            background: #4CAF50;
+        }
+
+        .vote-progress.no {
+            background: #f44336;
+        }
+
+        .vote-numbers {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        .vote-options {
+            margin-bottom: 20px;
+        }
+
+        .options-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 16px;
+        }
+
+        .vote-option {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .vote-option:hover {
+            border-color: #87CEEB;
+            background: rgba(255, 255, 255, 1);
+        }
+
+        .vote-option.selected {
+            border-color: #87CEEB;
+            background: rgba(135, 206, 235, 0.1);
+        }
+
+        .option-radio {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ddd;
+            border-radius: 50%;
+            margin-right: 12px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .vote-option.selected .option-radio {
+            border-color: #87CEEB;
+        }
+
+        .vote-option.selected .option-radio::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px;
+            height: 10px;
+            background: #87CEEB;
+            border-radius: 50%;
+        }
+
+        .option-content {
+            flex: 1;
+        }
+
+        .option-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+
+        .option-description {
+            font-size: 12px;
+            color: #6c757d;
+            line-height: 1.4;
+        }
+
+        .option-emoji {
+            font-size: 24px;
+            margin-left: 12px;
+        }
+
+        .vote-actions {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-top: 1px solid #e9ecef;
+        }
+
+        .vote-warning {
+            background: rgba(255, 152, 0, 0.1);
+            border: 1px solid #FF9800;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+
+        .warning-content {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .warning-icon {
+            font-size: 16px;
+            color: #f57c00;
+            margin-top: 1px;
+        }
+
+        .warning-text {
+            flex: 1;
+            font-size: 12px;
+            color: #6c757d;
+            line-height: 1.4;
+        }
+
+        .fee-info {
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 16px;
+            border: 1px solid #e9ecef;
+        }
+
+        .fee-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+        }
+
+        .fee-amount {
+            font-size: 14px;
+            color: #6c757d;
+            font-family: 'Monaco', 'Menlo', monospace;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-primary {
+            background: #87CEEB;
+            color: #1a1a1a;
+            box-shadow: 0 2px 8px rgba(135, 206, 235, 0.3);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #6bb6ff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(135, 206, 235, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #5a6268;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.4);
+        }
+
+        .success-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .success-icon {
+            font-size: 48px;
+            color: #4CAF50;
+            margin-bottom: 16px;
+        }
+
+        .success-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .success-message {
+            color: #6c757d;
+            font-size: 14px;
+            text-align: center;
+            line-height: 1.5;
+            margin-bottom: 24px;
+            max-width: 300px;
+        }
+
+        .tx-hash {
+            background: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 11px;
+            color: #6c757d;
+            margin-bottom: 20px;
+            word-break: break-all;
+            max-width: 300px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e0e6ed;
+            border-top: 4px solid #87CEEB;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="vote-container">
+        <div class="vote-header">
+            <button class="back-button" id="backButton">←</button>
+            <div class="vote-title">Cast Your Vote</div>
+            <div class="vote-subtitle">Republic of Suncity Democratic Process</div>
+        </div>
+
+        <div class="vote-content">
+            <div class="proposal-card">
+                <div class="proposal-id" id="proposalId">Proposal #1</div>
+                <div class="proposal-title" id="proposalTitle">Infrastructure Development Proposal</div>
+                <div class="proposal-description" id="proposalDescription">
+                    Vote on the new solar energy project for the coastal region. This proposal aims to establish a comprehensive renewable energy infrastructure that will serve the growing population while maintaining our commitment to environmental sustainability.
+                </div>
+
+                <div class="proposal-meta">
+                    <div class="meta-item">
+                        <div class="meta-label">Ends In</div>
+                        <div class="meta-value" id="timeRemaining">5 Days</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-label">Total Votes</div>
+                        <div class="meta-value" id="totalVotes">470</div>
+                    </div>
+                </div>
+
+                <div class="vote-stats">
+                    <div class="stats-title">Current Results</div>
+                    <div class="vote-bar">
+                        <div class="vote-progress yes" id="yesProgress" style="width: 72.8%;"></div>
+                    </div>
+                    <div class="vote-numbers">
+                        <span><strong id="yesVotes">342</strong> Yes (72.8%)</span>
+                        <span><strong id="noVotes">128</strong> No (27.2%)</span>
+                    </div>
+                </div>
+
+                <div class="vote-options">
+                    <div class="options-title">Cast Your Vote</div>
+                    
+                    <div class="vote-option" data-option="yes" id="voteYes">
+                        <div class="option-radio"></div>
+                        <div class="option-content">
+                            <div class="option-title">Vote YES</div>
+                            <div class="option-description">Support this proposal and approve the infrastructure development</div>
+                        </div>
+                        <div class="option-emoji">✅</div>
+                    </div>
+
+                    <div class="vote-option" data-option="no" id="voteNo">
+                        <div class="option-radio"></div>
+                        <div class="option-content">
+                            <div class="option-title">Vote NO</div>
+                            <div class="option-description">Reject this proposal and seek alternative solutions</div>
+                        </div>
+                        <div class="option-emoji">❌</div>
+                    </div>
+
+                    <div class="vote-option" data-option="abstain" id="voteAbstain">
+                        <div class="option-radio"></div>
+                        <div class="option-content">
+                            <div class="option-title">Abstain</div>
+                            <div class="option-description">Do not vote for or against this proposal</div>
+                        </div>
+                        <div class="option-emoji">⚪</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="vote-actions">
+            <div class="vote-warning">
+                <div class="warning-content">
+                    <div class="warning-icon">⚠️</div>
+                    <div class="warning-text">
+                        Your vote is permanent and cannot be changed once submitted to the blockchain. Please review your selection carefully.
+                    </div>
+                </div>
+            </div>
+
+            <div class="fee-info">
+                <div class="fee-title">Transaction Fee</div>
+                <div class="fee-amount">0.002000 SUNC (~$0.01 USD)</div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-secondary" id="cancelVote">
+                    Cancel
+                </button>
+                <button class="btn btn-primary" id="submitVote" disabled>
+                    <span>🗳️</span>
+                    Submit Vote
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div class="loading-overlay hidden" id="loadingOverlay">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Submitting your vote...</div>
+        </div>
+
+        <!-- Success Overlay -->
+        <div class="success-overlay hidden" id="successOverlay">
+            <div class="success-icon">🎉</div>
+            <div class="success-title">Vote Submitted!</div>
+            <div class="success-message">
+                Your vote has been successfully recorded on the Republic of Suncity blockchain and will be counted in the final tally.
+            </div>
+            <div class="tx-hash" id="transactionHash">
+                TX: 0x1234...5678
+            </div>
+            <button class="btn btn-primary" id="returnToVoting">
+                Return to Voting
+            </button>
+        </div>
+    </div>
+
+    <script>
+        class CastVoteHandler {
+            constructor() {
+                this.selectedOption = null;
+                this.proposalData = null;
+                this.walletAddress = null;
+                
+                this.init();
+            }
+
+            init() {
+                this.loadProposalData();
+                this.setupEventListeners();
+            }
+
+            setupEventListeners() {
+                // Back button
+                document.getElementById('backButton').addEventListener('click', () => {
+                    window.close();
+                });
+
+                // Vote option selection
+                document.querySelectorAll('.vote-option').forEach(option => {
+                    option.addEventListener('click', (e) => {
+                        this.selectVoteOption(e.currentTarget.dataset.option);
+                    });
+                });
+
+                // Action buttons
+                document.getElementById('cancelVote').addEventListener('click', () => {
+                    window.close();
+                });
+
+                document.getElementById('submitVote').addEventListener('click', () => {
+                    this.submitVote();
+                });
+
+                document.getElementById('returnToVoting').addEventListener('click', () => {
+                    window.close();
+                });
+            }
+
+            loadProposalData() {
+                // Get proposal data from URL parameters or storage
+                const urlParams = new URLSearchParams(window.location.search);
+                const proposalId = urlParams.get('id') || '1';
+                
+                // Mock proposal data - in real implementation, fetch from blockchain
+                this.proposalData = {
+                    id: proposalId,
+                    title: "Infrastructure Development Proposal",
+                    description: "Vote on the new solar energy project for the coastal region. This proposal aims to establish a comprehensive renewable energy infrastructure that will serve the growing population while maintaining our commitment to environmental sustainability.",
+                    endTime: Date.now() + (5 * 24 * 60 * 60 * 1000), // 5 days from now
+                    yesVotes: 342,
+                    noVotes: 128,
+                    totalVotes: 470,
+                    creator: "sunc1gov...",
+                    status: "active"
+                };
+
+                this.updateProposalDisplay();
+            }
+
+            updateProposalDisplay() {
+                document.getElementById('proposalId').textContent = `Proposal #${this.proposalData.id}`;
+                document.getElementById('proposalTitle').textContent = this.proposalData.title;
+                document.getElementById('proposalDescription').textContent = this.proposalData.description;
+                
+                // Update vote counts
+                document.getElementById('yesVotes').textContent = this.proposalData.yesVotes;
+                document.getElementById('noVotes').textContent = this.proposalData.noVotes;
+                document.getElementById('totalVotes').textContent = this.proposalData.totalVotes;
+                
+                // Update progress bar
+                const yesPercentage = (this.proposalData.yesVotes / this.proposalData.totalVotes) * 100;
+                document.getElementById('yesProgress').style.width = `${yesPercentage}%`;
+                
+                // Update time remaining
+                const daysLeft = Math.ceil((this.proposalData.endTime - Date.now()) / (24 * 60 * 60 * 1000));
+                document.getElementById('timeRemaining').textContent = `${daysLeft} Days`;
+            }
+
+            selectVoteOption(option) {
+                // Remove previous selections
+                document.querySelectorAll('.vote-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+
+                // Select new option
+                document.getElementById(`vote${option.charAt(0).toUpperCase() + option.slice(1)}`).classList.add('selected');
+                
+                this.selectedOption = option;
+                document.getElementById('submitVote').disabled = false;
+            }
+
+            async submitVote() {
+                if (!this.selectedOption) {
+                    this.showNotification('Please select a voting option', 'error');
+                    return;
+                }
+
+                document.getElementById('loadingOverlay').classList.remove('hidden');
+
+                try {
+                    // Simulate vote submission to blockchain
+                    await new Promise(resolve => setTimeout(resolve, 3000));
+                    
+                    // Mock transaction hash
+                    const txHash = 'TX' + Date.now().toString(16).toUpperCase() + Math.random().toString(36).substr(2, 6).toUpperCase();
+                    
+                    // Update success overlay
+                    document.getElementById('transactionHash').textContent = `TX: ${txHash}`;
+                    
+                    // Show success
+                    document.getElementById('loadingOverlay').classList.add('hidden');
+                    document.getElementById('successOverlay').classList.remove('hidden');
+                    
+                    // Update local vote counts (optimistic update)
+                    this.updateVoteCount();
+                    
+                } catch (error) {
+                    console.error('Vote submission failed:', error);
+                    document.getElementById('loadingOverlay').classList.add('hidden');
+                    this.showNotification('Failed to submit vote. Please try again.', 'error');
+                }
+            }
+
+            updateVoteCount() {
+                // Optimistically update vote count
+                if (this.selectedOption === 'yes') {
+                    this.proposalData.yesVotes++;
+                } else if (this.selectedOption === 'no') {
+                    this.proposalData.noVotes++;
+                }
+                this.proposalData.totalVotes++;
+                
+                // Store updated data for parent window
+                if (window.opener) {
+                    window.opener.postMessage({
+                        type: 'VOTE_CAST',
+                        proposalId: this.proposalData.id,
+                        option: this.selectedOption,
+                        updatedData: this.proposalData
+                    }, '*');
+                }
+            }
+
+            showNotification(message, type = 'success') {
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.textContent = message;
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: ${type === 'success' ? '#4CAF50' : '#f44336'};
+                    color: white;
+                    padding: 12px 16px;
+                    border-radius: 8px;
+                    font-weight: 500;
+                    z-index: 2000;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                `;
+                
+                document.body.appendChild(notification);
+                setTimeout(() => notification.remove(), 3000);
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new CastVoteHandler();
+        });
+    </script>
+</body>
+</html>

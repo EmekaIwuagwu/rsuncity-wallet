@@ -14,7 +14,7 @@ class SuncityBackgroundService {
       currencies: [{
         coinDenom: "SUNC",
         coinMinimalDenom: "sunc",
-        coinDecimals: 6
+        coinDecimals: 2
       }],
       feeCurrencies: [{
         coinDenom: "SUNC",

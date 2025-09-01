@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate Suncity Wallet Icons</title>
+</head>
+<body>
+    <h2>Republic of Suncity Wallet Icon Generator</h2>
+    <p>Right-click each canvas below and "Save image as..." to your popup/assets/ folder:</p>
+    
+    <div>
+        <h3>icon16.png</h3>
+        <canvas id="icon16" width="16" height="16"></canvas>
+    </div>
+    
+    <div>
+        <h3>icon32.png</h3>
+        <canvas id="icon32" width="32" height="32"></canvas>
+    </div>
+    
+    <div>
+        <h3>icon48.png</h3>
+        <canvas id="icon48" width="48" height="48"></canvas>
+    </div>
+    
+    <div>
+        <h3>icon128.png</h3>
+        <canvas id="icon128" width="128" height="128"></canvas>
+    </div>
+
+    <script>
+        function drawSunIcon(canvas, size) {
+            const ctx = canvas.getContext('2d');
+            const centerX = size / 2;
+            const centerY = size / 2;
+            const sunRadius = size * 0.3;
+            const rayLength = size * 0.15;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, size, size);
+            
+            // Background circle (sky blue)
+            ctx.fillStyle = '#87CEEB';
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, size / 2, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Sun rays
+            ctx.strokeStyle = '#FFD700';
+            ctx.lineWidth = size / 16;
+            ctx.lineCap = 'round';
+            
+            for (let i = 0; i < 8; i++) {
+                const angle = (i * Math.PI) / 4;
+                const startX = centerX + Math.cos(angle) * (sunRadius + 2);
+                const startY = centerY + Math.sin(angle) * (sunRadius + 2);
+                const endX = centerX + Math.cos(angle) * (sunRadius + rayLength);
+                const endY = centerY + Math.sin(angle) * (sunRadius + rayLength);
+                
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                ctx.lineTo(endX, endY);
+                ctx.stroke();
+            }
+            
+            // Sun body
+            ctx.fillStyle = '#FFD700';
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, sunRadius, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Sun face (optional for larger sizes)
+            if (size >= 32) {
+                ctx.fillStyle = '#FFA500';
+                
+                // Eyes
+                const eyeSize = size / 20;
+                ctx.beginPath();
+                ctx.arc(centerX - sunRadius/3, centerY - sunRadius/4, eyeSize, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.arc(centerX + sunRadius/3, centerY - sunRadius/4, eyeSize, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                // Smile
+                ctx.strokeStyle = '#FFA500';
+                ctx.lineWidth = size / 32;
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, sunRadius/3, 0.2 * Math.PI, 0.8 * Math.PI);
+                ctx.stroke();
+            }
+        }
+
+        // Generate all icon sizes
+        drawSunIcon(document.getElementById('icon16'), 16);
+        drawSunIcon(document.getElementById('icon32'), 32);
+        drawSunIcon(document.getElementById('icon48'), 48);
+        drawSunIcon(document.getElementById('icon128'), 128);
+        
+        // Auto-download function
+        function downloadIcon(canvasId, filename) {
+            const canvas = document.getElementById(canvasId);
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+        
+        // Add download buttons
+        document.body.innerHTML += `
+            <div style="margin-top: 20px;">
+                <button onclick="downloadIcon('icon16', 'icon16.png')">Download 16px Icon</button>
+                <button onclick="downloadIcon('icon32', 'icon32.png')">Download 32px Icon</button>
+                <button onclick="downloadIcon('icon48', 'icon48.png')">Download 48px Icon</button>
+                <button onclick="downloadIcon('icon128', 'icon128.png')">Download 128px Icon</button>
+            </div>
+        `;
+    </script>
+</body>
+</html>

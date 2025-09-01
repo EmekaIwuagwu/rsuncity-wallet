@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Wallet - Republic of Suncity</title>
+    <link rel="stylesheet" href="../../popup/popup.css">
+    <link rel="stylesheet" href="../../styles/components.css">
+    <style>
+        body {
+            width: 400px;
+            height: 600px;
+            margin: 0;
+            font-family: 'Inter', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #87CEEB 0%, #b8dcf0 100%);
+        }
+
+        .create-wallet-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .create-wallet-header {
+            background: #87CEEB;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .back-button {
+            position: absolute;
+            left: 15px;
+            top: 20px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #1a1a1a;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .create-wallet-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin: 0;
+        }
+
+        .create-wallet-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .step-container {
+            display: none;
+        }
+
+        .step-container.active {
+            display: block;
+        }
+
+        .step-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            background: #FFD700;
+            color: #1a1a1a;
+            border-radius: 50%;
+            font-weight: 700;
+            line-height: 32px;
+            margin-bottom: 10px;
+        }
+
+        .step-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .step-description {
+            color: #6c757d;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .form-section {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1a1a1a;
+            font-size: 14px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e6ed;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #87CEEB;
+        }
+
+        .form-input.error {
+            border-color: #f44336;
+        }
+
+        .password-requirements {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 12px;
+            border: 1px solid #e0e6ed;
+        }
+
+        .requirement {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        .requirement:last-child {
+            margin-bottom: 0;
+        }
+
+        .requirement-icon {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .requirement.valid {
+            color: #4CAF50;
+        }
+
+        .requirement.valid .requirement-icon {
+            color: #4CAF50;
+        }
+
+        .mnemonic-display {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px solid #e0e6ed;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .mnemonic-word {
+            background: #f8f9fa;
+            border: 1px solid #e0e6ed;
+            border-radius: 8px;
+            padding: 12px 8px;
+            text-align: center;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            position: relative;
+            font-weight: 500;
+        }
+
+        .mnemonic-word::before {
+            content: attr(data-index);
+            position: absolute;
+            top: -8px;
+            left: 8px;
+            font-size: 10px;
+            color: #6c757d;
+            background: white;
+            padding: 0 4px;
+            border-radius: 4px;
+        }
+
+        .security-warning {
+            background: rgba(255, 152, 0, 0.1);
+            border: 1px solid #FF9800;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 20px 0;
+        }
+
+        .warning-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .warning-icon {
+            font-size: 24px;
+            margin-right: 12px;
+        }
+
+        .warning-title {
+            font-weight: 600;
+            color: #f57c00;
+            font-size: 16px;
+        }
+
+        .warning-content {
+            color: #6c757d;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .warning-list {
+            margin: 12px 0 0 16px;
+            color: #6c757d;
+            font-size: 13px;
+        }
+
+        .warning-list li {
+            margin-bottom: 6px;
+        }
+
+        .verification-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #e0e6ed;
+        }
+
+        .verification-title {
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 16px;
+            font-size: 16px;
+        }
+
+        .word-slots {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .word-slot {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px dashed #e0e6ed;
+            border-radius: 6px;
+            padding: 8px 4px;
+            text-align: center;
+            font-size: 11px;
+            min-height: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .word-slot.filled {
+            background: #FFD700;
+            border-style: solid;
+            border-color: #FFA500;
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .word-slot.correct {
+            background: #4CAF50;
+            border-color: #45a049;
+            color: white;
+        }
+
+        .word-slot.incorrect {
+            background: #f44336;
+            border-color: #da190b;
+            color: white;
+        }
+
+        .slot-number {
+            font-size: 9px;
+            color: #6c757d;
+            margin-bottom: 2px;
+        }
+
+        .word-slot.filled .slot-number {
+            color: #1a1a1a;
+        }
+
+        .word-slot.correct .slot-number,
+        .word-slot.incorrect .slot-number {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .word-options {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .word-option {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #e0e6ed;
+            border-radius: 6px;
+            padding: 8px 6px;
+            text-align: center;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-weight: 500;
+        }
+
+        .word-option:hover:not(.used) {
+            background: #87CEEB;
+            color: white;
+            border-color: #6bb6ff;
+        }
+
+        .word-option.used {
+            opacity: 0.4;
+            cursor: not-allowed;
+            background: #f8f9fa;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-primary {
+            background: #87CEEB;
+            color: #1a1a1a;
+            box-shadow: 0 2px 8px rgba(135, 206, 235, 0.3);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #6bb6ff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(135, 206, 235, 0.4);
+        }
+
+        .btn-secondary {
+            background: #FFD700;
+            color: #1a1a1a;
+            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #ffcc00;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+        }
+
+        .progress-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .progress-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #e0e6ed;
+            margin: 0 4px;
+            transition: all 0.3s ease;
+        }
+
+        .progress-dot.active {
+            background: #87CEEB;
+            transform: scale(1.5);
+        }
+
+        .progress-dot.completed {
+            background: #4CAF50;
+        }
+
+        .reset-button {
+            background: none;
+            border: none;
+            color: #87CEEB;
+            cursor: pointer;
+            font-size: 12px;
+            text-decoration: underline;
+            margin-top: 8px;
+        }
+
+        .reset-button:hover {
+            color: #6bb6ff;
+        }
+
+        .success-screen {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .success-icon {
+            font-size: 48px;
+            color: #4CAF50;
+            margin-bottom: 16px;
+        }
+
+        .success-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .success-message {
+            color: #6c757d;
+            font-size: 14px;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e0e6ed;
+            border-top: 4px solid #87CEEB;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="create-wallet-container">
+        <div class="create-wallet-header">
+            <button class="back-button" id="backButton">←</button>
+            <div class="create-wallet-title">Create New Wallet</div>
+        </div>
+
+        <div class="create-wallet-content">
+            <div class="progress-indicator">
+                <div class="progress-dot active" data-step="1"></div>
+                <div class="progress-dot" data-step="2"></div>
+                <div class="progress-dot" data-step="3"></div>
+                <div class="progress-dot" data-step="4"></div>
+            </div>
+
+            <!-- Step 1: Password Creation -->
+            <div class="step-container active" id="step1">
+                <div class="step-header">
+                    <div class="step-number">1</div>
+                    <div class="step-title">Create Password</div>
+                    <div class="step-description">Secure your wallet with a strong password</div>
+                </div>
+
+                <div class="form-section">
+                    <label class="form-label" for="password">Password</label>
+                    <input type="password" id="password" class="form-input" placeholder="Enter password">
+                </div>
+
+                <div class="form-section">
+                    <label class="form-label" for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" class="form-input" placeholder="Confirm password">
+                </div>
+
+                <div class="password-requirements">
+                    <div class="requirement" data-req="length">
+                        <div class="requirement-icon">✗</div>
+                        <div>At least 8 characters</div>
+                    </div>
+                    <div class="requirement" data-req="uppercase">
+                        <div class="requirement-icon">✗</div>
+                        <div>One uppercase letter</div>
+                    </div>
+                    <div class="requirement" data-req="lowercase">
+                        <div class="requirement-icon">✗</div>
+                        <div>One lowercase letter</div>
+                    </div>
+                    <div class="requirement" data-req="number">
+                        <div class="requirement-icon">✗</div>
+                        <div>One number</div>
+                    </div>
+                    <div class="requirement" data-req="match">
+                        <div class="requirement-icon">✗</div>
+                        <div>Passwords match</div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="nextStep1" disabled>
+                        Next Step
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 2: Mnemonic Generation -->
+            <div class="step-container" id="step2">
+                <div class="step-header">
+                    <div class="step-number">2</div>
+                    <div class="step-title">Your Recovery Phrase</div>
+                    <div class="step-description">Write down these 24 words in the exact order shown</div>
+                </div>
+
+                <div class="mnemonic-display" id="mnemonicDisplay">
+                    <!-- Mnemonic words will be generated here -->
+                </div>
+
+                <div class="security-warning">
+                    <div class="warning-header">
+                        <div class="warning-icon">⚠️</div>
+                        <div class="warning-title">Keep Your Recovery Phrase Safe</div>
+                    </div>
+                    <div class="warning-content">
+                        Your recovery phrase is the only way to restore your wallet if you lose access to this device.
+                    </div>
+                    <ul class="warning-list">
+                        <li>Write it down on paper and store it securely</li>
+                        <li>Never share it with anyone</li>
+                        <li>Don't store it digitally or take screenshots</li>
+                        <li>We cannot recover your wallet without this phrase</li>
+                    </ul>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" id="backStep2">
+                        Back
+                    </button>
+                    <button class="btn btn-primary" id="nextStep2">
+                        I've Written It Down
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 3: Verification -->
+            <div class="step-container" id="step3">
+                <div class="step-header">
+                    <div class="step-number">3</div>
+                    <div class="step-title">Verify Recovery Phrase</div>
+                    <div class="step-description">Click the words in the correct order to verify</div>
+                </div>
+
+                <div class="verification-container">
+                    <div class="verification-title">Select the words in order:</div>
+                    
+                    <div class="word-slots" id="wordSlots">
+                        <!-- Word slots will be generated here -->
+                    </div>
+                    
+                    <div class="word-options" id="wordOptions">
+                        <!-- Shuffled word options will be generated here -->
+                    </div>
+                    
+                    <button class="reset-button" id="resetVerification">Reset Verification</button>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" id="backStep3">
+                        Back
+                    </button>
+                    <button class="btn btn-primary" id="nextStep3" disabled>
+                        Verify & Create
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 4: Success -->
+            <div class="step-container" id="step4">
+                <div class="success-screen">
+                    <div class="success-icon">✅</div>
+                    <div class="success-title">Wallet Created Successfully!</div>
+                    <div class="success-message">
+                        Your Republic of Suncity wallet has been created and is ready to use. You can now send and receive SUNC tokens and access government services.
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" id="completeSetup">
+                            Start Using Wallet
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div class="loading-overlay hidden" id="loadingOverlay">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Creating your wallet...</div>
+        </div>
+    </div>
+
+    <script>
+        class CreateWalletHandler {
+            constructor() {
+                this.currentStep = 1;
+                this.password = '';
+                this.mnemonic = [];
+                this.verificationPositions = [];
+                this.selectedWords = [];
+                
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+            }
+
+            setupEventListeners() {
+                // Back button
+                document.getElementById('backButton').addEventListener('click', () => {
+                    window.close();
+                });
+
+                // Step navigation buttons
+                document.getElementById('nextStep1').addEventListener('click', () => this.goToStep2());
+                document.getElementById('backStep2').addEventListener('click', () => this.goToStep1());
+                document.getElementById('nextStep2').addEventListener('click', () => this.goToStep3());
+                document.getElementById('backStep3').addEventListener('click', () => this.goToStep2());
+                document.getElementById('nextStep3').addEventListener('click', () => this.createWallet());
+                document.getElementById('completeSetup').addEventListener('click', () => this.completeSetup());
+
+                // Password validation
+                document.getElementById('password').addEventListener('input', () => this.validatePasswords());
+                document.getElementById('confirmPassword').addEventListener('input', () => this.validatePasswords());
+
+                // Verification reset
+                document.getElementById('resetVerification').addEventListener('click', () => this.resetVerification());
+            }
+
+            validatePasswords() {
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                const nextBtn = document.getElementById('nextStep1');
+
+                const requirements = {
+                    length: password.length >= 8,
+                    uppercase: /[A-Z]/.test(password),
+                    lowercase: /[a-z]/.test(password),
+                    number: /\d/.test(password),
+                    match: password === confirmPassword && confirmPassword.length > 0
+                };
+
+                // Update requirement indicators
+                Object.keys(requirements).forEach(req => {
+                    const element = document.querySelector(`[data-req="${req}"]`);
+                    if (requirements[req]) {
+                        element.classList.add('valid');
+                        element.querySelector('.requirement-icon').textContent = '✓';
+                    } else {
+                        element.classList.remove('valid');
+                        element.querySelector('.requirement-icon').textContent = '✗';
+                    }
+                });
+
+                // Enable/disable next button
+                const allValid = Object.values(requirements).every(Boolean);
+                nextBtn.disabled = !allValid;
+
+                if (allValid) {
+                    this.password = password;
+                }
+            }
+
+            goToStep1() {
+                this.showStep(1);
+            }
+
+            goToStep2() {
+                this.generateMnemonic();
+                this.showStep(2);
+            }
+
+            goToStep3() {
+                this.setupVerification();
+                this.showStep(3);
+            }
+
+            showStep(stepNumber) {
+                // Hide all steps
+                document.querySelectorAll('.step-container').forEach(step => {
+                    step.classList.remove('active');
+                });
+
+                // Show target step
+                document.getElementById(`step${stepNumber}`).classList.add('active');
+
+                // Update progress dots
+                document.querySelectorAll('.progress-dot').forEach((dot, index) => {
+                    dot.classList.remove('active', 'completed');
+                    if (index + 1 < stepNumber) {
+                        dot.classList.add('completed');
+                    } else if (index + 1 === stepNumber) {
+                        dot.classList.add('active');
+                    }
+                });
+
+                this.currentStep = stepNumber;
+            }
+
+            generateMnemonic() {
+                // BIP39 word list (simplified for demo - normally would use proper BIP39 library)
+                const wordList = [
+                    'abandon', 'ability', 'able', 'about', 'above', 'absent', 'absorb', 'abstract',
+                    'absurd', 'abuse', 'access', 'accident', 'account', 'accuse', 'achieve', 'acid',
+                    'acoustic', 'acquire', 'across', 'act', 'action', 'actor', 'actress', 'actual',
+                    'adapt', 'add', 'addict', 'address', 'adjust', 'admit', 'adult', 'advance',
+                    'advice', 'aerobic', 'affair', 'afford', 'afraid', 'again', 'agent', 'agree',
+                    'ahead', 'aim', 'air', 'airport', 'aisle', 'alarm', 'album', 'alcohol',
+                    'alert', 'alien', 'all', 'alley', 'allow', 'almost', 'alone', 'alpha',
+                    'already', 'also', 'alter', 'always', 'amateur', 'amazing', 'among', 'amount'
+                ];
+
+                this.mnemonic = [];
+                for (let i = 0; i < 24; i++) {
+                    const randomIndex = Math.floor(Math.random() * wordList.length);
+                    this.mnemonic.push(wordList[randomIndex]);
+                }
+
+                // Display mnemonic
+                const mnemonicDisplay = document.getElementById('mnemonicDisplay');
+                mnemonicDisplay.innerHTML = '';
+                
+                this.mnemonic.forEach((word, index) => {
+                    const wordElement = document.createElement('div');
+                    wordElement.className = 'mnemonic-word';
+                    wordElement.textContent = word;
+                    wordElement.setAttribute('data-index', index + 1);
+                    mnemonicDisplay.appendChild(wordElement);
+                });
+            }
+
+            setupVerification() {
+                // Select 6 random positions for verification
+                this.verificationPositions = [];
+                const positions = [];
+                
+                while (positions.length < 6) {
+                    const pos = Math.floor(Math.random() * 24);
+                    if (!positions.includes(pos)) {
+                        positions.push(pos);
+                    }
+                }
+                
+                positions.sort((a, b) => a - b);
+                this.verificationPositions = positions.map(pos => ({
+                    position: pos,
+                    word: this.mnemonic[pos]
+                }));
+
+                // Create word slots
+                const wordSlots = document.getElementById('wordSlots');
+                wordSlots.innerHTML = '';
+                
+                this.verificationPositions.forEach((item, index) => {
+                    const slot = document.createElement('div');
+                    slot.className = 'word-slot';
+                    slot.setAttribute('data-position', item.position);
+                    slot.setAttribute('data-index', index);
+                    slot.innerHTML = `
+                        <div class="slot-number">#${item.position + 1}</div>
+                        <div class="slot-word"></div>
+                    `;
+                    wordSlots.appendChild(slot);
+                });
+
+                // Create shuffled word options
+                const wordOptions = document.getElementById('wordOptions');
+                wordOptions.innerHTML = '';
+                
+                const allOptions = [...this.verificationPositions.map(item => item.word)];
+                
+                // Add some random words as distractors
+                const distractorWords = ['abandon', 'ability', 'abstract', 'account', 'achieve', 'address'];
+                while (allOptions.length < 12) {
+                    const randomWord = distractorWords[Math.floor(Math.random() * distractorWords.length)];
+                    if (!allOptions.includes(randomWord)) {
+                        allOptions.push(randomWord);
+                    }
+                }
+
+                // Shuffle options
+                allOptions.sort(() => Math.random() - 0.5);
+                
+                allOptions.forEach(word => {
+                    const option = document.createElement('div');
+                    option.className = 'word-option';
+                    option.textContent = word;
+                    option.addEventListener('click', () => this.selectWord(word, option));
+                    wordOptions.appendChild(option);
+                });
+
+                this.selectedWords = [];
+            }
+
+            selectWord(word, element) {
+                if (element.classList.contains('used')) return;
+                
+                if (this.selectedWords.length < 6) {
+                    const currentSlot = document.querySelector(`[data-index="${this.selectedWords.length}"]`);
+                    const wordDiv = currentSlot.querySelector('.slot-word');
+                    wordDiv.textContent = word;
+                    currentSlot.classList.add('filled');
+                    
+                    this.selectedWords.push(word);
+                    element.classList.add('used');
+                    
+                    this.checkVerification();
+                }
+            }
+
+            checkVerification() {
+                if (this.selectedWords.length === 6) {
+                    let allCorrect = true;
+                    
+                    // Check each word
+                    this.selectedWords.forEach((word, index) => {
+                        const slot = document.querySelector(`[data-index="${index}"]`);
+                        const expectedWord = this.verificationPositions[index].word;
+                        
+                        if (word === expectedWord) {
+                            slot.classList.add('correct');
+                            slot.classList.remove('incorrect');
+                        } else {
+                            slot.classList.add('incorrect');
+                            slot.classList.remove('correct');
+                            allCorrect = false;
+                        }
+                    });
+                    
+                    // Enable next button if all correct
+                    document.getElementById('nextStep3').disabled = !allCorrect;
+                }
+            }
+
+            resetVerification() {
+                this.selectedWords = [];
+                
+                // Reset slots
+                document.querySelectorAll('.word-slot').forEach(slot => {
+                    slot.classList.remove('filled', 'correct', 'incorrect');
+                    slot.querySelector('.slot-word').textContent = '';
+                });
+                
+                // Reset options
+                document.querySelectorAll('.word-option').forEach(option => {
+                    option.classList.remove('used');
+                });
+                
+                document.getElementById('nextStep3').disabled = true;
+            }
+
+            async createWallet() {
+                document.getElementById('loadingOverlay').classList.remove('hidden');
+                
+                try {
+                    // Simulate wallet creation
+                    await new Promise(resolve => setTimeout(resolve, 3000));
+                    
+                    // Create wallet data
+                    const walletData = {
+                        mnemonic: this.mnemonic.join(' '),
+                        address: 'sunc1' + Math.random().toString(36).substr(2, 39),
+                        publicKey: 'suncpub1' + Math.random().toString(36).substr(2, 32),
+                        encrypted: true,
+                        created: Date.now()
+                    };
+
+                    // Store wallet data (simplified)
+                    console.log('Wallet created:', walletData);
+                    
+                    this.showStep(4);
+                    
+                } catch (error) {
+                    console.error('Wallet creation failed:', error);
+                    this.showNotification('Failed to create wallet. Please try again.', 'error');
+                } finally {
+                    document.getElementById('loadingOverlay').classList.add('hidden');
+                }
+            }
+
+            completeSetup() {
+                window.close();
+            }
+
+            showNotification(message, type = 'success') {
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.textContent = message;
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: ${type === 'success' ? '#4CAF50' : '#f44336'};
+                    color: white;
+                    padding: 12px 16px;
+                    border-radius: 8px;
+                    font-weight: 500;
+                    z-index: 2000;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                `;
+                
+                document.body.appendChild(notification);
+                setTimeout(() => notification.remove(), 3000);
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new CreateWalletHandler();
+        });
+    </script>
+</body>
+</html>

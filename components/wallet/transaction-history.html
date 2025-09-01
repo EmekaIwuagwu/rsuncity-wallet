@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction History - Republic of Suncity</title>
+    <link rel="stylesheet" href="../../popup/popup.css">
+    <link rel="stylesheet" href="../../styles/components.css">
+    <style>
+        body {
+            width: 400px;
+            height: 600px;
+            margin: 0;
+            font-family: 'Inter', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #87CEEB 0%, #b8dcf0 100%);
+        }
+
+        .history-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .history-header {
+            background: #87CEEB;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .back-button {
+            position: absolute;
+            left: 15px;
+            top: 20px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #1a1a1a;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .history-title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin: 0;
+        }
+
+        .history-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .search-filter-section {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 16px 20px;
+            border-bottom: 1px solid #e0e6ed;
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 40px 10px 16px;
+            border: 2px solid #e0e6ed;
+            border-radius: 8px;
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.95);
+            transition: border-color 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #87CEEB;
+        }
+
+        .search-input::placeholder {
+            color: #9e9e9e;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            pointer-events: none;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 8px;
+        }
+
+        .filter-tab {
+            flex: 1;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid #e0e6ed;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+            color: #6c757d;
+        }
+
+        .filter-tab.active {
+            background: #87CEEB;
+            color: #1a1a1a;
+            border-color: #6bb6ff;
+        }
+
+        .filter-tab:hover:not(.active) {
+            background: rgba(135, 206, 235, 0.2);
+        }
+
+        .date-range-filters {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .date-filter {
+            padding: 4px 8px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid #e0e6ed;
+            border-radius: 12px;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .date-filter.active {
+            background: #FFD700;
+            color: #1a1a1a;
+            border-color: #ffcc00;
+        }
+
+        .date-filter:hover:not(.active) {
+            background: rgba(255, 215, 0, 0.2);
+        }
+
+        .transactions-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 20px 20px 20px;
+        }
+
+        .transaction-item {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid #e0e6ed;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .transaction-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-color: #87CEEB;
+        }
+
+        .transaction-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .transaction-type-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .transaction-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .transaction-icon.send {
+            background: rgba(244, 67, 54, 0.1);
+            color: #f44336;
+        }
+
+        .transaction-icon.receive {
+            background: rgba(76, 175, 80, 0.1);
+            color: #4CAF50;
+        }
+
+        .transaction-icon.government {
+            background: rgba(33, 150, 243, 0.1);
+            color: #2196F3;
+        }
+
+        .transaction-icon.vote {
+            background: rgba(255, 152, 0, 0.1);
+            color: #FF9800;
+        }
+
+        .transaction-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .transaction-type {
+            font-weight: 600;
+            color: #1a1a1a;
+            font-size: 15px;
+            margin-bottom: 2px;
+        }
+
+        .transaction-description {
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 4px;
+        }
+
+        .transaction-address {
+            font-size: 11px;
+            color: #9e9e9e;
+            font-family: 'Monaco', 'Menlo', monospace;
+        }
+
+        .transaction-amount-section {
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .transaction-amount {
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 2px;
+        }
+
+        .transaction-amount.positive {
+            color: #4CAF50;
+        }
+
+        .transaction-amount.negative {
+            color: #f44336;
+        }
+
+        .transaction-amount.neutral {
+            color: #6c757d;
+        }
+
+        .transaction-time {
+            font-size: 11px;
+            color: #9e9e9e;
+        }
+
+        .transaction-status {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .transaction-status.success {
+            background: #4CAF50;
+        }
+
+        .transaction-status.pending {
+            background: #FF9800;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .transaction-status.failed {
+            background: #f44336;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .transaction-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #f0f0f0;
+            font-size: 11px;
+        }
+
+        .transaction-hash {
+            color: #6c757d;
+            font-family: 'Monaco', 'Menlo', monospace;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .transaction-hash:hover {
+            color: #87CEEB;
+        }
+
+        .transaction-fee {
+            color: #9e9e9e;
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            color: #6c757d;
+            text-align: center;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1a1a1a;
+        }
+
+        .empty-description {
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .empty-action {
+            padding: 10px 20px;
+            background: #87CEEB;
+            color: #1a1a1a;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .empty-action:hover {
+            background: #6bb6ff;
+            transform: translateY(-1px);
+        }
+
+        .loading-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .loading-spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid #e0e6ed;
+            border-top: 3px solid #87CEEB;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .transaction-summary {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 16px 20px;
+            border-bottom: 1px solid #e0e6ed;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+            text-align: center;
+        }
+
+        .summary-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .summary-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+
+        .summary-label {
+            font-size: 11px;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .refresh-button {
+            position: absolute;
+            top: 20px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: #1a1a1a;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+
+        .refresh-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(180deg);
+        }
+
+        .export-button {
+            position: absolute;
+            top: 20px;
+            right: 55px;
+            background: none;
+            border: none;
+            color: #1a1a1a;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+
+        .export-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px 20px;
+            gap: 8px;
+        }
+
+        .pagination-button {
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #e0e6ed;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #6c757d;
+        }
+
+        .pagination-button:hover:not(:disabled) {
+            background: #87CEEB;
+            color: #1a1a1a;
+            border-color: #6bb6ff;
+        }
+
+        .pagination-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination-button.active {
+            background: #87CEEB;
+            color: #1a1a1a;
+            border-color: #6bb6ff;
+        }
+
+        .pagination-info {
+            font-size: 11px;
+            color: #6c757d;
+            margin: 0 8px;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+
+        .no-results-icon {
+            font-size: 36px;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="history-container">
+        <div class="history-header">
+            <button class="back-button" id="backButton">←</button>
+            <button class="export-button" id="exportButton" title="Export History">📄</button>
+            <button class="refresh-button" id="refreshButton" title="Refresh">🔄</button>
+            <div class="history-title">Transaction History</div>
+        </div>
+
+        <div class="transaction-summary" id="transactionSummary">
+            <div class="summary-item">
+                <div class="summary-value" id="totalTransactions">0</div>
+                <div class="summary-label">Total</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-value" id="totalSent">0.000</div>
+                <div class="summary-label">Sent</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-value" id="totalReceived">0.000</div>
+                <div class="summary-label">Received</div>
+            </div>
+        </div>
+
+        <div class="history-content">
+            <div class="search-filter-section">
+                <div class="search-container">
+                    <input type="text" class="search-input" id="searchInput" 
+                           placeholder="Search by address, hash, or description...">
+                    <div class="search-icon">🔍</div>
+                </div>
+                
+                <div class="filter-tabs">
+                    <button class="filter-tab active" data-filter="all">All</button>
+                    <button class="filter-tab" data-filter="send">Send</button>
+                    <button class="filter-tab" data-filter="receive">Receive</button>
+                    <button class="filter-tab" data-filter="government">Gov</button>
+                </div>
+                
+                <div class="date-range-filters">
+                    <button class="date-filter active" data-range="all">All Time</button>
+                    <button class="date-filter" data-range="today">Today</button>
+                    <button class="date-filter" data-range="week">This Week</button>
+                    <button class="date-filter" data-range="month">This Month</button>
+                    <button class="date-filter" data-range="year">This Year</button>
+                </div>
+            </div>
+
+            <div class="transactions-list" id="transactionsList">
+                <!-- Loading state -->
+                <div class="loading-state" id="loadingState">
+                    <div class="loading-spinner"></div>
+                    <div>Loading transactions...</div>
+                </div>
+
+                <!-- Transaction items will be populated here -->
+            </div>
+
+            <div class="pagination hidden" id="pagination">
+                <button class="pagination-button" id="prevPage" disabled>‹ Previous</button>
+                <div class="pagination-info" id="pageInfo">Page 1 of 1</div>
+                <button class="pagination-button" id="nextPage" disabled>Next ›</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class TransactionHistoryHandler {
+            constructor() {
+                this.transactions = [];
+                this.filteredTransactions = [];
+                this.currentFilter = 'all';
+                this.currentDateRange = 'all';
+                this.searchTerm = '';
+                this.currentPage = 1;
+                this.transactionsPerPage = 20;
+                this.userAddress = 'sunc1example...address'; // Mock user address
+                
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.loadTransactions();
+            }
+
+            setupEventListeners() {
+                // Navigation buttons
+                document.getElementById('backButton').addEventListener('click', () => {
+                    window.close();
+                });
+
+                document.getElementById('refreshButton').addEventListener('click', () => {
+                    this.refreshTransactions();
+                });
+
+                document.getElementById('exportButton').addEventListener('click', () => {
+                    this.exportTransactions();
+                });
+
+                // Search functionality
+                document.getElementById('searchInput').addEventListener('input', (e) => {
+                    this.searchTerm = e.target.value.toLowerCase();
+                    this.applyFilters();
+                });
+
+                // Filter tabs
+                document.querySelectorAll('.filter-tab').forEach(tab => {
+                    tab.addEventListener('click', (e) => {
+                        this.setTypeFilter(e.target.dataset.filter, e.target);
+                    });
+                });
+
+                // Date filters
+                document.querySelectorAll('.date-filter').forEach(filter => {
+                    filter.addEventListener('click', (e) => {
+                        this.setDateFilter(e.target.dataset.range, e.target);
+                    });
+                });
+
+                // Pagination
+                document.getElementById('prevPage').addEventListener('click', () => {
+                    if (this.currentPage > 1) {
+                        this.currentPage--;
+                        this.renderTransactions();
+                    }
+                });
+
+                document.getElementById('nextPage').addEventListener('click', () => {
+                    const totalPages = Math.ceil(this.filteredTransactions.length / this.transactionsPerPage);
+                    if (this.currentPage < totalPages) {
+                        this.currentPage++;
+                        this.renderTransactions();
+                    }
+                });
+            }
+
+            async loadTransactions() {
+                document.getElementById('loadingState').classList.remove('hidden');
+                
+                try {
+                    // Simulate API call
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                    
+                    // Mock transaction data
+                    this.transactions = this.generateMockTransactions();
+                    
+                    this.applyFilters();
+                    this.updateSummary();
+                    
+                } catch (error) {
+                    console.error('Failed to load transactions:', error);
+                    this.showError('Failed to load transaction history');
+                } finally {
+                    document.getElementById('loadingState').classList.add('hidden');
+                }
+            }
+
+            generateMockTransactions() {
+                const transactions = [];
+                const types = [
+                    { type: 'receive', icon: '📥', description: 'Received from', amount: '+' },
+                    { type: 'send', icon: '📤', description: 'Sent to', amount: '-' },
+                    { type: 'government', icon: '🏛️', description: 'Land Registration', amount: '-' },
+                    { type: 'government', icon: '👤', description: 'Citizen Registration', amount: '-' },
+                    { type: 'vote', icon: '🗳️', description: 'Vote Cast', amount: '-' }
+                ];
+
+                for (let i = 0; i < 50; i++) {
+                    const typeData = types[Math.floor(Math.random() * types.length)];
+                    const amount = Math.random() * 1000;
+                    const fee = Math.random() * 0.01;
+                    const timestamp = Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000; // Random time in last 30 days
+                    
+                    transactions.push({
+                        hash: 'TX' + Math.random().toString(36).substr(2, 12).toUpperCase(),
+                        type: typeData.type,
+                        icon: typeData.icon,
+                        description: typeData.description,
+                        address: 'sunc1' + Math.random().toString(36).substr(2, 35),
+                        amount: typeData.amount + amount.toFixed(6),
+                        fee: fee.toFixed(6),
+                        timestamp: timestamp,
+                        status: Math.random() > 0.05 ? 'success' : (Math.random() > 0.5 ? 'pending' : 'failed'),
+                        blockHeight: Math.floor(Math.random() * 100000) + 50000
+                    });
+                }
+
+                // Sort by timestamp (newest first)
+                return transactions.sort((a, b) => b.timestamp - a.timestamp);
+            }
+
+            setTypeFilter(filter, element) {
+                this.currentFilter = filter;
+                
+                // Update UI
+                document.querySelectorAll('.filter-tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                element.classList.add('active');
+                
+                this.applyFilters();
+            }
+
+            setDateFilter(range, element) {
+                this.currentDateRange = range;
+                
+                // Update UI
+                document.querySelectorAll('.date-filter').forEach(filter => {
+                    filter.classList.remove('active');
+                });
+                element.classList.add('active');
+                
+                this.applyFilters();
+            }
+
+            applyFilters() {
+                this.filteredTransactions = this.transactions.filter(tx => {
+                    // Type filter
+                    if (this.currentFilter !== 'all' && tx.type !== this.currentFilter) {
+                        return false;
+                    }
+                    
+                    // Date filter
+                    if (!this.matchesDateFilter(tx.timestamp)) {
+                        return false;
+                    }
+                    
+                    // Search filter
+                    if (this.searchTerm && !this.matchesSearch(tx)) {
+                        return false;
+                    }
+                    
+                    return true;
+                });
+
+                this.currentPage = 1;
+                this.renderTransactions();
+            }
+
+            matchesDateFilter(timestamp) {
+                const now = Date.now();
+                const txDate = new Date(timestamp);
+                const today = new Date();
+                
+                switch (this.currentDateRange) {
+                    case 'today':
+                        return txDate.toDateString() === today.toDateString();
+                    case 'week':
+                        return (now - timestamp) <= 7 * 24 * 60 * 60 * 1000;
+                    case 'month':
+                        return (now - timestamp) <= 30 * 24 * 60 * 60 * 1000;
+                    case 'year':
+                        return (now - timestamp) <= 365 * 24 * 60 * 60 * 1000;
+                    default:
+                        return true;
+                }
+            }
+
+            matchesSearch(tx) {
+                const searchFields = [
+                    tx.hash.toLowerCase(),
+                    tx.description.toLowerCase(),
+                    tx.address.toLowerCase(),
+                    tx.type.toLowerCase()
+                ];
+                
+                return searchFields.some(field => field.includes(this.searchTerm));
+            }
+
+            renderTransactions() {
+                const transactionsList = document.getElementById('transactionsList');
+                const loadingState = document.getElementById('loadingState');
+                
+                // Clear previous content
+                transactionsList.innerHTML = '';
+                loadingState.classList.add('hidden');
+
+                if (this.filteredTransactions.length === 0) {
+                    this.showEmptyState(transactionsList);
+                    return;
+                }
+
+                // Calculate pagination
+                const startIndex = (this.currentPage - 1) * this.transactionsPerPage;
+                const endIndex = Math.min(startIndex + this.transactionsPerPage, this.filteredTransactions.length);
+                const pageTransactions = this.filteredTransactions.slice(startIndex, endIndex);
+
+                // Render transactions
+                pageTransactions.forEach(tx => {
+                    const txElement = this.createTransactionElement(tx);
+                    transactionsList.appendChild(txElement);
+                });
+
+                this.updatePagination();
+            }
+
+            createTransactionElement(tx) {
+                const element = document.createElement('div');
+                element.className = 'transaction-item';
+                
+                const amountClass = tx.amount.startsWith('+') ? 'positive' : 
+                                  tx.amount.startsWith('-') ? 'negative' : 'neutral';
+                
+                const statusClass = tx.status;
+                const timeStr = this.formatTimeAgo(tx.timestamp);
+                const shortAddress = this.formatAddress(tx.address);
+                const shortHash = tx.hash.slice(0, 8) + '...' + tx.hash.slice(-4);
+
+                element.innerHTML = `
+                    <div class="transaction-status ${statusClass}"></div>
+                    <div class="transaction-header">
+                        <div class="transaction-type-info">
+                            <div class="transaction-icon ${tx.type}">
+                                ${tx.icon}
+                            </div>
+                            <div class="transaction-details">
+                                <div class="transaction-type">${this.formatTransactionType(tx.type)}</div>
+                                <div class="transaction-description">${tx.description}</div>
+                                <div class="transaction-address">${shortAddress}</div>
+                            </div>
+                        </div>
+                        <div class="transaction-amount-section">
+                            <div class="transaction-amount ${amountClass}">${tx.amount} SUNC</div>
+                            <div class="transaction-time">${timeStr}</div>
+                        </div>
+                    </div>
+                    <div class="transaction-footer">
+                        <div class="transaction-hash" title="Click to copy hash">${shortHash}</div>
+                        <div class="transaction-fee">Fee: ${tx.fee} SUNC</div>
+                    </div>
+                `;
+
+                // Add click handlers
+                element.addEventListener('click', () => this.showTransactionDetails(tx));
+                
+                const hashElement = element.querySelector('.transaction-hash');
+                hashElement.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.copyToClipboard(tx.hash);
+                });
+
+                return element;
+            }
+
+            showEmptyState(container) {
+                const emptyState = document.createElement('div');
+                emptyState.className = 'empty-state';
+                
+                if (this.searchTerm || this.currentFilter !== 'all' || this.currentDateRange !== 'all') {
+                    // No results for filters
+                    emptyState.innerHTML = `
+                        <div class="empty-icon">🔍</div>
+                        <div class="empty-title">No transactions found</div>
+                        <div class="empty-description">Try adjusting your filters or search terms</div>
+                        <button class="empty-action" onclick="window.historyHandler.clearFilters()">
+                            Clear Filters
+                        </button>
+                    `;
+                } else {
+                    // No transactions at all
+                    emptyState.innerHTML = `
+                        <div class="empty-icon">📋</div>
+                        <div class="empty-title">No transactions yet</div>
+                        <div class="empty-description">Your transaction history will appear here once you start using your wallet</div>
+                        <button class="empty-action" onclick="window.close()">
+                            Start Trading
+                        </button>
+                    `;
+                }
+                
+                container.appendChild(emptyState);
+            }
+
+            updatePagination() {
+                const pagination = document.getElementById('pagination');
+                const totalPages = Math.ceil(this.filteredTransactions.length / this.transactionsPerPage);
+                
+                if (totalPages <= 1) {
+                    pagination.classList.add('hidden');
+                    return;
+                }
+                
+                pagination.classList.remove('hidden');
+                
+                const prevBtn = document.getElementById('prevPage');
+                const nextBtn = document.getElementById('nextPage');
+                const pageInfo = document.getElementById('pageInfo');
+                
+                prevBtn.disabled = this.currentPage === 1;
+                nextBtn.disabled = this.currentPage === totalPages;
+                pageInfo.textContent = `Page ${this.currentPage} of ${totalPages}`;
+            }
+
+            updateSummary() {
+                const totalTx = this.transactions.length;
+                let totalSent = 0;
+                let totalReceived = 0;
+
+                this.transactions.forEach(tx => {
+                    const amount = parseFloat(tx.amount.replace(/[+-]/, ''));
+                    if (tx.amount.startsWith('+')) {
+                        totalReceived += amount;
+                    } else if (tx.amount.startsWith('-') && tx.type !== 'government' && tx.type !== 'vote') {
+                        totalSent += amount;
+                    }
+                });
+
+                document.getElementById('totalTransactions').textContent = totalTx;
+                document.getElementById('totalSent').textContent = totalSent.toFixed(3);
+                document.getElementById('totalReceived').textContent = totalReceived.toFixed(3);
+            }
+
+            clearFilters() {
+                this.currentFilter = 'all';
+                this.currentDateRange = 'all';
+                this.searchTerm = '';
+                
+                // Reset UI
+                document.getElementById('searchInput').value = '';
+                document.querySelector('.filter-tab.active').classList.remove('active');
+                document.querySelector('[data-filter="all"]').classList.add('active');
+                document.querySelector('.date-filter.active').classList.remove('active');
+                document.querySelector('[data-range="all"]').classList.add('active');
+                
+                this.applyFilters();
+            }
+
+            async refreshTransactions() {
+                const refreshBtn = document.getElementById('refreshButton');
+                refreshBtn.style.animation = 'spin 1s linear infinite';
+                
+                try {
+                    await this.loadTransactions();
+                    this.showNotification('Transaction history updated', 'success');
+                } catch (error) {
+                    this.showNotification('Failed to refresh transactions', 'error');
+                } finally {
+                    refreshBtn.style.animation = '';
+                }
+            }
+
+            exportTransactions() {
+                try {
+                    const csvData = this.transactionsToCsv(this.filteredTransactions);
+                    this.downloadCsv(csvData, 'suncity-transactions.csv');
+                    this.showNotification('Transaction history exported', 'success');
+                } catch (error) {
+                    this.showNotification('Failed to export transactions', 'error');
+                }
+            }
+
+            transactionsToCsv(transactions) {
+                const headers = ['Hash', 'Type', 'Description', 'Amount', 'Fee', 'Date', 'Status'];
+                const rows = transactions.map(tx => [
+                    tx.hash,
+                    tx.type,
+                    tx.description,
+                    tx.amount + ' SUNC',
+                    tx.fee + ' SUNC',
+                    new Date(tx.timestamp).toISOString(),
+                    tx.status
+                ]);
+                
+                return [headers, ...rows].map(row => row.join(',')).join('\n');
+            }
+
+            downloadCsv(csvData, filename) {
+                const blob = new Blob([csvData], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+
+            showTransactionDetails(tx) {
+                // In a real implementation, this would open a detailed view
+                this.showNotification(`Transaction details: ${tx.hash}`, 'info');
+            }
+
+            copyToClipboard(text) {
+                navigator.clipboard.writeText(text).then(() => {
+                    this.showNotification('Transaction hash copied', 'success');
+                }).catch(() => {
+                    this.showNotification('Failed to copy hash', 'error');
+                });
+            }
+
+            formatTransactionType(type) {
+                const types = {
+                    send: 'Send',
+                    receive: 'Receive',
+                    government: 'Government Service',
+                    vote: 'Vote'
+                };
+                return types[type] || type;
+            }
+
+            formatAddress(address) {
+                if (!address) return '';
+                return address.slice(0, 10) + '...' + address.slice(-6);
+            }
+
+            formatTimeAgo(timestamp) {
+                const now = Date.now();
+                const diff = now - timestamp;
+                const minutes = Math.floor(diff / (1000 * 60));
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+                if (minutes < 60) {
+                    return minutes <= 1 ? 'Just now' : `${minutes}m ago`;
+                } else if (hours < 24) {
+                    return `${hours}h ago`;
+                } else {
+                    return `${days}d ago`;
+                }
+            }
+
+            showError(message) {
+                const transactionsList = document.getElementById('transactionsList');
+                transactionsList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">⚠️</div>
+                        <div class="empty-title">Error Loading Transactions</div>
+                        <div class="empty-description">${message}</div>
+                        <button class="empty-action" onclick="window.historyHandler.loadTransactions()">
+                            Try Again
+                        </button>
+                    </div>
+                `;
+            }
+
+            showNotification(message, type = 'success') {
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.textContent = message;
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};
+                    color: white;
+                    padding: 12px 16px;
+                    border-radius: 8px;
+                    font-weight: 500;
+                    z-index: 1000;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                `;
+                
+                document.body.appendChild(notification);
+                setTimeout(() => notification.remove(), 3000);
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            window.historyHandler = new TransactionHistoryHandler();
+        });
+    </script>
+</body>
+</html>

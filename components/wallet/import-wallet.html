@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import Wallet - Republic of Suncity</title>
+    <link rel="stylesheet" href="../../popup/popup.css">
+    <link rel="stylesheet" href="../../styles/components.css">
+    <style>
+        body {
+            width: 400px;
+            height: 600px;
+            margin: 0;
+            font-family: 'Inter', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #87CEEB 0%, #b8dcf0 100%);
+        }
+
+        .import-wallet-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .import-wallet-header {
+            background: #87CEEB;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .back-button {
+            position: absolute;
+            left: 15px;
+            top: 20px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #1a1a1a;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .import-wallet-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin: 0;
+        }
+
+        .import-wallet-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .step-container {
+            display: none;
+        }
+
+        .step-container.active {
+            display: block;
+        }
+
+        .step-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            background: #FFD700;
+            color: #1a1a1a;
+            border-radius: 50%;
+            font-weight: 700;
+            line-height: 32px;
+            margin-bottom: 10px;
+        }
+
+        .step-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .step-description {
+            color: #6c757d;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .form-section {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1a1a1a;
+            font-size: 14px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e6ed;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #87CEEB;
+        }
+
+        .form-input.error {
+            border-color: #f44336;
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .input-helper {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 6px;
+            line-height: 1.4;
+        }
+
+        .input-error {
+            font-size: 12px;
+            color: #f44336;
+            margin-top: 6px;
+            line-height: 1.4;
+        }
+
+        .mnemonic-input-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #e0e6ed;
+        }
+
+        .mnemonic-input-title {
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        .word-counter {
+            position: absolute;
+            bottom: 8px;
+            right: 12px;
+            font-size: 11px;
+            color: #6c757d;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .mnemonic-validation {
+            margin-top: 12px;
+        }
+
+        .validation-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        .validation-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .validation-icon {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .validation-item.valid {
+            color: #4CAF50;
+        }
+
+        .validation-item.invalid {
+            color: #f44336;
+        }
+
+        .validation-item.valid .validation-icon {
+            color: #4CAF50;
+        }
+
+        .validation-item.invalid .validation-icon {
+            color: #f44336;
+        }
+
+        .import-methods {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .import-method {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #e0e6ed;
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .import-method:hover {
+            border-color: #87CEEB;
+            background: rgba(255, 255, 255, 1);
+        }
+
+        .import-method.active {
+            border-color: #87CEEB;
+            background: rgba(135, 206, 235, 0.1);
+        }
+
+        .import-method-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .import-method-title {
+            font-weight: 600;
+            color: #1a1a1a;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .import-method-desc {
+            font-size: 11px;
+            color: #6c757d;
+            line-height: 1.3;
+        }
+
+        .password-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #e0e6ed;
+        }
+
+        .password-section-title {
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        .password-requirements {
+            background: rgba(248, 249, 250, 0.8);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 12px;
+            border: 1px solid #e9ecef;
+        }
+
+        .requirement {
+            display: flex;
+            align-items: center;
+            margin-bottom: 6px;
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        .requirement:last-child {
+            margin-bottom: 0;
+        }
+
+        .requirement-icon {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .requirement.valid {
+            color: #4CAF50;
+        }
+
+        .requirement.valid .requirement-icon {
+            color: #4CAF50;
+        }
+
+        .private-key-section {
+            background: rgba(255, 152, 0, 0.1);
+            border: 1px solid #FF9800;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .private-key-warning {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .warning-icon {
+            font-size: 20px;
+            margin-right: 12px;
+            color: #f57c00;
+        }
+
+        .warning-content {
+            flex: 1;
+        }
+
+        .warning-title {
+            font-weight: 600;
+            color: #f57c00;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .warning-text {
+            color: #6c757d;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .private-key-input {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 11px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-primary {
+            background: #87CEEB;
+            color: #1a1a1a;
+            box-shadow: 0 2px 8px rgba(135, 206, 235, 0.3);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #6bb6ff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(135, 206, 235, 0.4);
+        }
+
+        .btn-secondary {
+            background: #FFD700;
+            color: #1a1a1a;
+            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #ffcc00;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+        }
+
+        .progress-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .progress-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #e0e6ed;
+            margin: 0 4px;
+            transition: all 0.3s ease;
+        }
+
+        .progress-dot.active {
+            background: #87CEEB;
+            transform: scale(1.5);
+        }
+
+        .progress-dot.completed {
+            background: #4CAF50;
+        }
+
+        .success-screen {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .success-icon {
+            font-size: 48px;
+            color: #4CAF50;
+            margin-bottom: 16px;
+        }
+
+        .success-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .success-message {
+            color: #6c757d;
+            font-size: 14px;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .wallet-info {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+            border: 1px solid #e0e6ed;
+        }
+
+        .wallet-address {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 11px;
+            word-break: break-all;
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 4px;
+            margin-top: 8px;
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e0e6ed;
+            border-top: 4px solid #87CEEB;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .position-relative {
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+    <div class="import-wallet-container">
+        <div class="import-wallet-header">
+            <button class="back-button" id="backButton">←</button>
+            <div class="import-wallet-title">Import Existing Wallet</div>
+        </div>
+
+        <div class="import-wallet-content">
+            <div class="progress-indicator">
+                <div class="progress-dot active" data-step="1"></div>
+                <div class="progress-dot" data-step="2"></div>
+                <div class="progress-dot" data-step="3"></div>
+            </div>
+
+            <!-- Step 1: Choose Import Method -->
+            <div class="step-container active" id="step1">
+                <div class="step-header">
+                    <div class="step-number">1</div>
+                    <div class="step-title">Choose Import Method</div>
+                    <div class="step-description">Select how you want to restore your wallet</div>
+                </div>
+
+                <div class="import-methods">
+                    <div class="import-method active" id="mnemonicMethod" data-method="mnemonic">
+                        <div class="import-method-icon">🔑</div>
+                        <div class="import-method-title">Recovery Phrase</div>
+                        <div class="import-method-desc">12 or 24 word seed phrase</div>
+                    </div>
+                    <div class="import-method" id="privateKeyMethod" data-method="private-key">
+                        <div class="import-method-icon">🔐</div>
+                        <div class="import-method-title">Private Key</div>
+                        <div class="import-method-desc">64-character hex string</div>
+                    </div>
+                </div>
+
+                <!-- Mnemonic Input -->
+                <div class="import-content" id="mnemonicContent">
+                    <div class="mnemonic-input-container">
+                        <div class="mnemonic-input-title">Enter Recovery Phrase</div>
+                        <div class="position-relative">
+                            <textarea 
+                                id="mnemonicInput" 
+                                class="form-input form-textarea" 
+                                placeholder="Enter your 12 or 24 word recovery phrase separated by spaces..."
+                            ></textarea>
+                            <div class="word-counter" id="wordCounter">0 words</div>
+                        </div>
+                        <div class="input-helper">
+                            Separate each word with a space. Your recovery phrase should be 12 or 24 words long.
+                        </div>
+                        
+                        <div class="mnemonic-validation">
+                            <div class="validation-item" id="wordCountValidation">
+                                <div class="validation-icon">○</div>
+                                <div>Correct number of words (12 or 24)</div>
+                            </div>
+                            <div class="validation-item" id="wordFormatValidation">
+                                <div class="validation-icon">○</div>
+                                <div>All words are valid format</div>
+                            </div>
+                            <div class="validation-item" id="duplicateValidation">
+                                <div class="validation-icon">○</div>
+                                <div>No duplicate words found</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Private Key Input -->
+                <div class="import-content hidden" id="privateKeyContent">
+                    <div class="private-key-section">
+                        <div class="private-key-warning">
+                            <div class="warning-icon">⚠️</div>
+                            <div class="warning-content">
+                                <div class="warning-title">Private Key Import</div>
+                                <div class="warning-text">
+                                    Only enter your private key if you trust this device. Private keys provide full access to your wallet.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-section">
+                            <label class="form-label" for="privateKeyInput">Private Key</label>
+                            <input 
+                                type="password" 
+                                id="privateKeyInput" 
+                                class="form-input private-key-input" 
+                                placeholder="Enter your 64-character private key..."
+                            >
+                            <div class="input-helper">
+                                Your private key should be a 64-character hexadecimal string
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="nextStep1" disabled>
+                        Next Step
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 2: Set Password -->
+            <div class="step-container" id="step2">
+                <div class="step-header">
+                    <div class="step-number">2</div>
+                    <div class="step-title">Secure Your Wallet</div>
+                    <div class="step-description">Create a password to protect your wallet on this device</div>
+                </div>
+
+                <div class="password-section">
+                    <div class="password-section-title">Wallet Protection</div>
+                    
+                    <div class="form-section">
+                        <label class="form-label" for="password">Password</label>
+                        <input type="password" id="password" class="form-input" placeholder="Enter password">
+                    </div>
+
+                    <div class="form-section">
+                        <label class="form-label" for="confirmPassword">Confirm Password</label>
+                        <input type="password" id="confirmPassword" class="form-input" placeholder="Confirm password">
+                    </div>
+
+                    <div class="password-requirements">
+                        <div class="requirement" data-req="length">
+                            <div class="requirement-icon">✗</div>
+                            <div>At least 8 characters</div>
+                        </div>
+                        <div class="requirement" data-req="uppercase">
+                            <div class="requirement-icon">✗</div>
+                            <div>One uppercase letter</div>
+                        </div>
+                        <div class="requirement" data-req="lowercase">
+                            <div class="requirement-icon">✗</div>
+                            <div>One lowercase letter</div>
+                        </div>
+                        <div class="requirement" data-req="number">
+                            <div class="requirement-icon">✗</div>
+                            <div>One number</div>
+                        </div>
+                        <div class="requirement" data-req="match">
+                            <div class="requirement-icon">✗</div>
+                            <div>Passwords match</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" id="backStep2">
+                        Back
+                    </button>
+                    <button class="btn btn-primary" id="nextStep2" disabled>
+                        Import Wallet
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 3: Success -->
+            <div class="step-container" id="step3">
+                <div class="success-screen">
+                    <div class="success-icon">✅</div>
+                    <div class="success-title">Wallet Imported Successfully!</div>
+                    <div class="success-message">
+                        Your Republic of Suncity wallet has been restored and is ready to use. You can now access all your tokens and government services.
+                    </div>
+                    
+                    <div class="wallet-info">
+                        <strong>Your Wallet Address:</strong>
+                        <div class="wallet-address" id="walletAddress">Loading...</div>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" id="completeImport">
+                            Start Using Wallet
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div class="loading-overlay hidden" id="loadingOverlay">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Importing your wallet...</div>
+        </div>
+    </div>
+
+    <script>
+        class ImportWalletHandler {
+            constructor() {
+                this.currentStep = 1;
+                this.importMethod = 'mnemonic';
+                this.importData = '';
+                this.password = '';
+                
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+            }
+
+            setupEventListeners() {
+                // Back button
+                document.getElementById('backButton').addEventListener('click', () => {
+                    window.close();
+                });
+
+                // Import method selection
+                document.querySelectorAll('.import-method').forEach(method => {
+                    method.addEventListener('click', (e) => {
+                        this.selectImportMethod(e.currentTarget.dataset.method);
+                    });
+                });
+
+                // Step navigation
+                document.getElementById('nextStep1').addEventListener('click', () => this.goToStep2());
+                document.getElementById('backStep2').addEventListener('click', () => this.goToStep1());
+                document.getElementById('nextStep2').addEventListener('click', () => this.importWallet());
+                document.getElementById('completeImport').addEventListener('click', () => this.completeImport());
+
+                // Input validation
+                document.getElementById('mnemonicInput').addEventListener('input', () => this.validateMnemonic());
+                document.getElementById('privateKeyInput').addEventListener('input', () => this.validatePrivateKey());
+                document.getElementById('password').addEventListener('input', () => this.validatePasswords());
+                document.getElementById('confirmPassword').addEventListener('input', () => this.validatePasswords());
+            }
+
+            selectImportMethod(method) {
+                this.importMethod = method;
+                
+                // Update UI
+                document.querySelectorAll('.import-method').forEach(m => m.classList.remove('active'));
+                document.getElementById(method + 'Method').classList.add('active');
+                
+                // Show/hide content
+                document.querySelectorAll('.import-content').forEach(content => {
+                    content.classList.add('hidden');
+                });
+                document.getElementById(method === 'mnemonic' ? 'mnemonicContent' : 'privateKeyContent').classList.remove('hidden');
+                
+                // Reset validation
+                if (method === 'mnemonic') {
+                    this.validateMnemonic();
+                } else {
+                    this.validatePrivateKey();
+                }
+            }
+
+            validateMnemonic() {
+                const input = document.getElementById('mnemonicInput').value.trim();
+                const words = input.toLowerCase().split(/\s+/).filter(word => word.length > 0);
+                
+                // Update word counter
+                document.getElementById('wordCounter').textContent = `${words.length} words`;
+                
+                const validations = {
+                    wordCount: words.length === 12 || words.length === 24,
+                    wordFormat: words.every(word => /^[a-z]+$/.test(word) && word.length >= 3),
+                    duplicates: new Set(words).size === words.length
+                };
+                
+                // Update validation indicators
+                this.updateValidationItem('wordCountValidation', validations.wordCount);
+                this.updateValidationItem('wordFormatValidation', validations.wordFormat && words.length > 0);
+                this.updateValidationItem('duplicateValidation', validations.duplicates || words.length === 0);
+                
+                const isValid = Object.values(validations).every(Boolean) && words.length > 0;
+                document.getElementById('nextStep1').disabled = !isValid;
+                
+                if (isValid) {
+                    this.importData = input;
+                }
+            }
+
+            validatePrivateKey() {
+                const privateKey = document.getElementById('privateKeyInput').value.trim();
+                const isValid = /^[0-9a-fA-F]{64}$/.test(privateKey);
+                
+                const input = document.getElementById('privateKeyInput');
+                if (isValid) {
+                    input.classList.remove('error');
+                    this.importData = privateKey;
+                } else if (privateKey.length > 0) {
+                    input.classList.add('error');
+                } else {
+                    input.classList.remove('error');
+                }
+                
+                document.getElementById('nextStep1').disabled = !isValid;
+            }
+
+            updateValidationItem(id, isValid) {
+                const item = document.getElementById(id);
+                const icon = item.querySelector('.validation-icon');
+                
+                if (isValid) {
+                    item.classList.add('valid');
+                    item.classList.remove('invalid');
+                    icon.textContent = '✓';
+                } else {
+                    item.classList.remove('valid');
+                    item.classList.add('invalid');
+                    icon.textContent = '✗';
+                }
+            }
+
+            validatePasswords() {
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                
+                const requirements = {
+                    length: password.length >= 8,
+                    uppercase: /[A-Z]/.test(password),
+                    lowercase: /[a-z]/.test(password),
+                    number: /\d/.test(password),
+                    match: password === confirmPassword && confirmPassword.length > 0
+                };
+
+                // Update requirement indicators
+                Object.keys(requirements).forEach(req => {
+                    const element = document.querySelector(`[data-req="${req}"]`);
+                    if (requirements[req]) {
+                        element.classList.add('valid');
+                        element.querySelector('.requirement-icon').textContent = '✓';
+                    } else {
+                        element.classList.remove('valid');
+                        element.querySelector('.requirement-icon').textContent = '✗';
+                    }
+                });
+
+                const allValid = Object.values(requirements).every(Boolean);
+                document.getElementById('nextStep2').disabled = !allValid;
+
+                if (allValid) {
+                    this.password = password;
+                }
+            }
+
+            goToStep1() {
+                this.showStep(1);
+            }
+
+            goToStep2() {
+                this.showStep(2);
+            }
+
+            showStep(stepNumber) {
+                // Hide all steps
+                document.querySelectorAll('.step-container').forEach(step => {
+                    step.classList.remove('active');
+                });
+
+                // Show target step
+                document.getElementById(`step${stepNumber}`).classList.add('active');
+
+                // Update progress dots
+                document.querySelectorAll('.progress-dot').forEach((dot, index) => {
+                    dot.classList.remove('active', 'completed');
+                    if (index + 1 < stepNumber) {
+                        dot.classList.add('completed');
+                    } else if (index + 1 === stepNumber) {
+                        dot.classList.add('active');
+                    }
+                });
+
+                this.currentStep = stepNumber;
+            }
+
+            async importWallet() {
+                document.getElementById('loadingOverlay').classList.remove('hidden');
+                
+                try {
+                    // Simulate wallet import
+                    await new Promise(resolve => setTimeout(resolve, 2500));
+                    
+                    // Generate wallet address based on import method
+                    let address;
+                    if (this.importMethod === 'mnemonic') {
+                        // In real implementation, derive address from mnemonic
+                        address = 'sunc1' + Math.random().toString(36).substr(2, 39);
+                    } else {
+                        // In real implementation, derive address from private key
+                        address = 'sunc1' + Math.random().toString(36).substr(2, 39);
+                    }
+                    
+                    // Store wallet data (simplified)
+                    const walletData = {
+                        address: address,
+                        importMethod: this.importMethod,
+                        encrypted: true,
+                        imported: Date.now()
+                    };
+
+                    console.log('Wallet imported:', walletData);
+                    
+                    // Update success screen
+                    document.getElementById('walletAddress').textContent = address;
+                    
+                    this.showStep(3);
+                    
+                } catch (error) {
+                    console.error('Wallet import failed:', error);
+                    this.showNotification('Failed to import wallet. Please check your input and try again.', 'error');
+                } finally {
+                    document.getElementById('loadingOverlay').classList.add('hidden');
+                }
+            }
+
+            completeImport() {
+                window.close();
+            }
+
+            showNotification(message, type = 'success') {
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.textContent = message;
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: ${type === 'success' ? '#4CAF50' : '#f44336'};
+                    color: white;
+                    padding: 12px 16px;
+                    border-radius: 8px;
+                    font-weight: 500;
+                    z-index: 2000;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                `;
+                
+                document.body.appendChild(notification);
+                setTimeout(() => notification.remove(), 3000);
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new ImportWalletHandler();
+        });
+    </script>
+</body>
+</html>

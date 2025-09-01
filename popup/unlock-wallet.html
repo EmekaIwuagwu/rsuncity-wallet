@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unlock Wallet - Republic of Suncity</title>
+    <link rel="stylesheet" href="../../popup/popup.css">
+    <link rel="stylesheet" href="../../styles/components.css">
+    <style>
+        body {
+            width: 400px;
+            height: 600px;
+            margin: 0;
+            font-family: 'Inter', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #87CEEB 0%, #b8dcf0 100%);
+        }
+
+        .unlock-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .unlock-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo-section {
+            margin-bottom: 24px;
+        }
+
+        .sun-icon {
+            font-size: 64px;
+            color: #FFD700;
+            margin-bottom: 16px;
+            text-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+            animation: gentle-glow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes gentle-glow {
+            0% { text-shadow: 0 2px 8px rgba(255, 215, 0, 0.3); }
+            100% { text-shadow: 0 4px 16px rgba(255, 215, 0, 0.5); }
+        }
+
+        .app-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .app-subtitle {
+            font-size: 14px;
+            color: #555;
+            font-style: italic;
+        }
+
+        .unlock-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 32px;
+            width: 100%;
+            max-width: 320px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .unlock-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .unlock-description {
+            font-size: 14px;
+            color: #6c757d;
+            text-align: center;
+            margin-bottom: 24px;
+            line-height: 1.4;
+        }
+
+        .wallet-info {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+            border: 1px solid #e9ecef;
+            text-align: center;
+        }
+
+        .wallet-address-label {
+            font-size: 12px;
+            color: #6c757d;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+
+        .wallet-address {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            color: #1a1a1a;
+            background: #fff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+            word-break: break-all;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1a1a1a;
+            font-size: 14px;
+        }
+
+        .password-input-container {
+            position: relative;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e6ed;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            background: rgba(255, 255, 255, 0.95);
+            box-sizing: border-box;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #87CEEB;
+            box-shadow: 0 0 0 3px rgba(135, 206, 235, 0.1);
+        }
+
+        .form-input.error {
+            border-color: #f44336;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #6c757d;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 4px;
+            border-radius: 4px;
+            transition: color 0.3s ease;
+        }
+
+        .toggle-password:hover {
+            color: #87CEEB;
+        }
+
+        .error-message {
+            color: #f44336;
+            font-size: 12px;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .error-icon {
+            font-size: 14px;
+        }
+
+        .forgot-password {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .forgot-link {
+            color: #87CEEB;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .forgot-link:hover {
+            color: #6bb6ff;
+            text-decoration: underline;
+        }
+
+        .unlock-button {
+            width: 100%;
+            padding: 16px 20px;
+            background: #87CEEB;
+            color: #1a1a1a;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(135, 206, 235, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .unlock-button:hover:not(:disabled) {
+            background: #6bb6ff;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(135, 206, 235, 0.4);
+        }
+
+        .unlock-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .unlock-button.loading {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .loading-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid transparent;
+            border-top: 2px solid #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alternative-actions {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .action-text {
+            color: #6c757d;
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+        .secondary-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .secondary-button {
+            background: transparent;
+            color: #87CEEB;
+            border: 1px solid #87CEEB;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .secondary-button:hover {
+            background: #87CEEB;
+            color: #1a1a1a;
+        }
+
+        .auto-lock-info {
+            background: rgba(255, 152, 0, 0.1);
+            border: 1px solid #FF9800;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+        }
+
+        .auto-lock-content {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .auto-lock-icon {
+            font-size: 16px;
+            color: #f57c00;
+            margin-top: 1px;
+        }
+
+        .auto-lock-text {
+            flex: 1;
+            font-size: 12px;
+            color: #6c757d;
+            line-height: 1.4;
+        }
+
+        .attempts-warning {
+            background: rgba(244, 67, 54, 0.1);
+            border: 1px solid #f44336;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .attempts-icon {
+            font-size: 20px;
+            color: #f44336;
+            margin-bottom: 8px;
+        }
+
+        .attempts-text {
+            font-size: 12px;
+            color: #c62828;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        .biometric-section {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .biometric-button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .biometric-button:hover {
+            background: #45a049;
+            transform: translateY(-1px);
+        }
+
+        .biometric-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .network-status {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            color: #6c757d;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .network-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #4CAF50;
+        }
+
+        .network-dot.disconnected {
+            background: #f44336;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="unlock-container">
+        <!-- Network Status -->
+        <div class="network-status">
+            <div class="network-dot" id="networkDot"></div>
+            <span id="networkStatus">Connected</span>
+        </div>
+
+        <!-- Header -->
+        <div class="unlock-header">
+            <div class="logo-section">
+                <div class="sun-icon">☀️</div>
+                <div class="app-title">Republic of Suncity</div>
+                <div class="app-subtitle">Lux, Libertas, Prosperitas</div>
+            </div>
+        </div>
+
+        <!-- Unlock Card -->
+        <div class="unlock-card">
+            <div class="unlock-title">Welcome Back!</div>
+            <div class="unlock-description">
+                Enter your password to unlock your Republic of Suncity wallet
+            </div>
+
+            <!-- Auto-lock Information -->
+            <div class="auto-lock-info">
+                <div class="auto-lock-content">
+                    <div class="auto-lock-icon">🔒</div>
+                    <div class="auto-lock-text">
+                        Your wallet was automatically locked for security after 30 minutes of inactivity.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Failed Attempts Warning -->
+            <div class="attempts-warning hidden" id="attemptsWarning">
+                <div class="attempts-icon">⚠️</div>
+                <div class="attempts-text" id="attemptsText">
+                    Too many failed attempts. Please wait before trying again.
+                </div>
+            </div>
+
+            <!-- Wallet Info -->
+            <div class="wallet-info">
+                <div class="wallet-address-label">Wallet Address</div>
+                <div class="wallet-address" id="walletAddress">
+                    sunc1qjsj8k2lm9xrtvn3p4k6j8h9g7f5d4c3b2a1z9x8y7w6v5
+                </div>
+            </div>
+
+            <!-- Password Form -->
+            <form id="unlockForm">
+                <div class="form-group">
+                    <label class="form-label" for="password">Password</label>
+                    <div class="password-input-container">
+                        <input 
+                            type="password" 
+                            id="password" 
+                            class="form-input" 
+                            placeholder="Enter your wallet password"
+                            autocomplete="current-password"
+                            required
+                        >
+                        <button type="button" class="toggle-password" id="togglePassword">
+                            👁️
+                        </button>
+                    </div>
+                    <div class="error-message hidden" id="errorMessage">
+                        <span class="error-icon">⚠️</span>
+                        <span id="errorText">Incorrect password. Please try again.</span>
+                    </div>
+                </div>
+
+                <!-- Biometric Authentication (if available) -->
+                <div class="biometric-section hidden" id="biometricSection">
+                    <div style="margin-bottom: 12px; color: #6c757d; font-size: 13px;">Or use biometric authentication</div>
+                    <button type="button" class="biometric-button" id="biometricButton">
+                        <span>👆</span>
+                        Use Fingerprint
+                    </button>
+                </div>
+
+                <div class="forgot-password">
+                    <a href="#" class="forgot-link" id="forgotPassword">
+                        Forgot your password?
+                    </a>
+                </div>
+
+                <button type="submit" class="unlock-button" id="unlockButton">
+                    <span id="unlockButtonText">🔓 Unlock Wallet</span>
+                </button>
+            </form>
+
+            <!-- Alternative Actions -->
+            <div class="alternative-actions">
+                <div class="action-text">Need to access a different wallet?</div>
+                <div class="secondary-actions">
+                    <button class="secondary-button" id="importWalletButton">
+                        Import Wallet
+                    </button>
+                    <button class="secondary-button" id="createWalletButton">
+                        Create New
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class WalletUnlockHandler {
+            constructor() {
+                this.failedAttempts = 0;
+                this.maxAttempts = 5;
+                this.lockoutTime = 300000; // 5 minutes
+                this.isLocked = false;
+                this.lockoutTimer = null;
+                
+                this.init();
+            }
+
+            init() {
+                this.loadWalletInfo();
+                this.setupEventListeners();
+                this.checkLockoutStatus();
+                this.checkBiometricAvailability();
+            }
+
+            setupEventListeners() {
+                // Form submission
+                document.getElementById('unlockForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.attemptUnlock();
+                });
+
+                // Password visibility toggle
+                document.getElementById('togglePassword').addEventListener('click', () => {
+                    this.togglePasswordVisibility();
+                });
+
+                // Enter key in password field
+                document.getElementById('password').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !this.isLocked) {
+                        this.attemptUnlock();
+                    }
+                });
+
+                // Biometric authentication
+                document.getElementById('biometricButton').addEventListener('click', () => {
+                    this.attemptBiometricUnlock();
+                });
+
+                // Forgot password
+                document.getElementById('forgotPassword').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.handleForgotPassword();
+                });
+
+                // Alternative actions
+                document.getElementById('importWalletButton').addEventListener('click', () => {
+                    this.openImportWallet();
+                });
+
+                document.getElementById('createWalletButton').addEventListener('click', () => {
+                    this.openCreateWallet();
+                });
+
+                // Clear error on input
+                document.getElementById('password').addEventListener('input', () => {
+                    this.clearError();
+                });
+            }
+
+            loadWalletInfo() {
+                // Load wallet information from storage
+                chrome.storage.local.get(['walletData'], (result) => {
+                    if (result.walletData && result.walletData.address) {
+                        document.getElementById('walletAddress').textContent = result.walletData.address;
+                    }
+                });
+
+                // Load failed attempts from storage
+                chrome.storage.local.get(['failedAttempts', 'lockoutUntil'], (result) => {
+                    this.failedAttempts = result.failedAttempts || 0;
+                    const lockoutUntil = result.lockoutUntil || 0;
+                    
+                    if (lockoutUntil > Date.now()) {
+                        this.startLockout(lockoutUntil - Date.now());
+                    }
+                });
+            }
+
+            togglePasswordVisibility() {
+                const passwordInput = document.getElementById('password');
+                const toggleButton = document.getElementById('togglePassword');
+                
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    toggleButton.textContent = '🙈';
+                } else {
+                    passwordInput.type = 'password';
+                    toggleButton.textContent = '👁️';
+                }
+            }
+
+            async attemptUnlock() {
+                if (this.isLocked) {
+                    this.showError('Please wait before trying again.');
+                    return;
+                }
+
+                const password = document.getElementById('password').value;
+                if (!password) {
+                    this.showError('Please enter your password.');
+                    return;
+                }
+
+                this.showLoading(true);
+                
+                try {
+                    // Simulate password verification
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    
+                    // Mock password check - in real implementation, verify against stored hash
+                    const isValidPassword = this.verifyPassword(password);
+                    
+                    if (isValidPassword) {
+                        // Successful unlock
+                        this.handleSuccessfulUnlock();
+                    } else {
+                        // Failed unlock
+                        this.handleFailedUnlock();
+                    }
+                    
+                } catch (error) {
+                    console.error('Unlock error:', error);
+                    this.showError('An error occurred while unlocking. Please try again.');
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+
+            verifyPassword(password) {
+                // Mock password verification - in real implementation, use stored hash
+                // For demo purposes, accept any password with length >= 8
+                return password.length >= 8;
+            }
+
+            handleSuccessfulUnlock() {
+                // Reset failed attempts
+                this.failedAttempts = 0;
+                chrome.storage.local.remove(['failedAttempts', 'lockoutUntil']);
+                
+                // Unlock wallet in storage
+                chrome.storage.local.set({ isLocked: false });
+                
+                // Show success and redirect
+                this.showSuccess();
+                
+                setTimeout(() => {
+                    // Close this window and open main wallet
+                    window.close();
+                }, 1500);
+            }
+
+            handleFailedUnlock() {
+                this.failedAttempts++;
+                
+                // Store failed attempts
+                chrome.storage.local.set({ failedAttempts: this.failedAttempts });
+                
+                if (this.failedAttempts >= this.maxAttempts) {
+                    // Start lockout period
+                    const lockoutUntil = Date.now() + this.lockoutTime;
+                    chrome.storage.local.set({ lockoutUntil });
+                    this.startLockout(this.lockoutTime);
+                } else {
+                    const attemptsLeft = this.maxAttempts - this.failedAttempts;
+                    this.showError(`Incorrect password. ${attemptsLeft} attempt${attemptsLeft !== 1 ? 's' : ''} remaining.`);
+                    
+                    // Shake the password input
+                    document.getElementById('password').classList.add('error');
+                    setTimeout(() => {
+                        document.getElementById('password').classList.remove('error');
+                    }, 500);
+                }
+                
+                // Clear password field
+                document.getElementById('password').value = '';
+            }
+
+            startLockout(duration) {
+                this.isLocked = true;
+                this.showAttemptsWarning(true);
+                
+                const unlockButton = document.getElementById('unlockButton');
+                const passwordInput = document.getElementById('password');
+                
+                unlockButton.disabled = true;
+                passwordInput.disabled = true;
+                
+                // Update lockout timer
+                this.updateLockoutTimer(duration);
+                
+                this.lockoutTimer = setInterval(() => {
+                    duration -= 1000;
+                    if (duration <= 0) {
+                        this.endLockout();
+                    } else {
+                        this.updateLockoutTimer(duration);
+                    }
+                }, 1000);
+            }
+
+            updateLockoutTimer(remainingTime) {
+                const minutes = Math.floor(remainingTime / 60000);
+                const seconds = Math.floor((remainingTime % 60000) / 1000);
+                const timeText = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                
+                document.getElementById('attemptsText').textContent = 
+                    `Too many failed attempts. Please wait ${timeText} before trying again.`;
+            }
+
+            endLockout() {
+                this.isLocked = false;
+                this.showAttemptsWarning(false);
+                
+                if (this.lockoutTimer) {
+                    clearInterval(this.lockoutTimer);
+                    this.lockoutTimer = null;
+                }
+                
+                const unlockButton = document.getElementById('unlockButton');
+                const passwordInput = document.getElementById('password');
+                
+                unlockButton.disabled = false;
+                passwordInput.disabled = false;
+                passwordInput.focus();
+                
+                // Remove lockout from storage
+                chrome.storage.local.remove(['lockoutUntil']);
+            }
+
+            async attemptBiometricUnlock() {
+                // Check if biometric authentication is available
+                if ('credentials' in navigator && 'create' in navigator.credentials) {
+                    try {
+                        this.showNotification('Biometric authentication not implemented in demo', 'info');
+                    } catch (error) {
+                        this.showError('Biometric authentication failed.');
+                    }
+                }
+            }
+
+            checkBiometricAvailability() {
+                // Check if biometric authentication is supported
+                if ('credentials' in navigator) {
+                    // For demo purposes, show biometric option randomly
+                    if (Math.random() > 0.5) {
+                        document.getElementById('biometricSection').classList.remove('hidden');
+                    }
+                }
+            }
+
+            checkLockoutStatus() {
+                chrome.storage.local.get(['lockoutUntil'], (result) => {
+                    const lockoutUntil = result.lockoutUntil || 0;
+                    
+                    if (lockoutUntil > Date.now()) {
+                        this.startLockout(lockoutUntil - Date.now());
+                    }
+                });
+            }
+
+            handleForgotPassword() {
+                const message = `If you forgot your password, you'll need to restore your wallet using your 24-word recovery phrase.\n\nThis will create a new password and restore access to your funds.\n\nWould you like to restore your wallet?`;
+                
+                if (confirm(message)) {
+                    this.openImportWallet();
+                }
+            }
+
+            openImportWallet() {
+                // Open import wallet page
+                chrome.tabs.create({
+                    url: chrome.runtime.getURL('components/wallet/import-wallet.html')
+                });
+                window.close();
+            }
+
+            openCreateWallet() {
+                // Open create wallet flow
+                window.close();
+                // In real implementation, would navigate to create wallet
+            }
+
+            showLoading(show) {
+                const button = document.getElementById('unlockButton');
+                const buttonText = document.getElementById('unlockButtonText');
+                
+                if (show) {
+                    button.classList.add('loading');
+                    button.disabled = true;
+                    buttonText.innerHTML = '<div class="loading-spinner"></div> Unlocking...';
+                } else {
+                    button.classList.remove('loading');
+                    button.disabled = false;
+                    buttonText.innerHTML = '🔓 Unlock Wallet';
+                }
+            }
+
+            showSuccess() {
+                this.clearError();
+                const button = document.getElementById('unlockButton');
+                const buttonText = document.getElementById('unlockButtonText');
+                
+                button.style.background = '#4CAF50';
+                buttonText.innerHTML = '✅ Wallet Unlocked';
+            }
+
+            showError(message) {
+                const errorMessage = document.getElementById('errorMessage');
+                const errorText = document.getElementById('errorText');
+                
+                errorText.textContent = message;
+                errorMessage.classList.remove('hidden');
+            }
+
+            clearError() {
+                document.getElementById('errorMessage').classList.add('hidden');
+            }
+
+            showAttemptsWarning(show) {
+                const warning = document.getElementById('attemptsWarning');
+                if (show) {
+                    warning.classList.remove('hidden');
+                } else {
+                    warning.classList.add('hidden');
+                }
+            }
+
+            showNotification(message, type = 'success') {
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.textContent = message;
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: ${type === 'success' ? '#4CAF50' : type === 'info' ? '#2196F3' : '#f44336'};
+                    color: white;
+                    padding: 12px 16px;
+                    border-radius: 8px;
+                    font-weight: 500;
+                    z-index: 2000;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                `;
+                
+                document.body.appendChild(notification);
+                setTimeout(() => notification.remove(), 3000);
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new WalletUnlockHandler();
+        });
+    </script>
+</body>
+</html>

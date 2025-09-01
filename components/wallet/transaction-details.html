@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction Details - Republic of Suncity Wallet</title>
+    <link rel="stylesheet" href="../../popup/popup.css">
+    <link rel="stylesheet" href="../../styles/components.css">
+    <style>
+        body {
+            width: 400px;
+            height: 600px;
+            margin: 0;
+            font-family: 'Inter', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #87CEEB 0%, #b8dcf0 100%);
+        }
+
+        .details-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .details-header {
+            background: #87CEEB;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .back-button {
+            position: absolute;
+            left: 15px;
+            top: 20px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #1a1a1a;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .share-button {
+            position: absolute;
+            right: 15px;
+            top: 20px;
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: #1a1a1a;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .share-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .details-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin: 0;
+        }
+
+        .details-subtitle {
+            font-size: 12px;
+            color: #555;
+            margin-top: 4px;
+        }
+
+        .details-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .status-banner {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid #e0e6ed;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .status-indicator.success {
+            background: rgba(76, 175, 80, 0.1);
+            color: #2e7d32;
+            border: 1px solid #4CAF50;
+        }
+
+        .status-indicator.pending {
+            background: rgba(255, 152, 0, 0.1);
+            color: #f57c00;
+            border: 1px solid #FF9800;
+            animation: pulse 2s ease-in-out infinite alternate;
+        }
+
+        .status-indicator.failed {
+            background: rgba(244, 67, 54, 0.1);
+            color: #c62828;
+            border: 1px solid #f44336;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        .tx-hash-display {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            color: #6c757d;
+            background: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 6px;
+            word-break: break-all;
+            margin-bottom: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .confirmations-info {
+            font-size: 13px;
+            color: #6c757d;
+        }
+
+        .section-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid #e0e6ed;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .section-icon {
+            font-size: 20px;
+            margin-right: 12px;
+            color: #87CEEB;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-size: 14px;
+            color: #6c757d;
+            font-weight: 500;
+            min-width: 100px;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            color: #1a1a1a;
+            font-weight: 500;
+            text-align: right;
+            word-break: break-all;
+            flex: 1;
+            margin-left: 12px;
+        }
+
+        .detail-value.mono {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+        }
+
+        .detail-value.amount {
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .detail-value.positive {
+            color: #4CAF50;
+        }
+
+        .detail-value.negative {
+            color: #f44336;
+        }
+
+        .detail-value.fee {
+            color: #f57c00;
+        }
+
+        .address-value {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .address-text {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 11px;
+            color: #1a1a1a;
+        }
+
+        .address-short {
+            display: inline;
+        }
+
+        .address-full {
+            display: none;
+        }
+
+        .address-value.expanded .address-short {
+            display: none;
+        }
+
+        .address-value.expanded .address-full {
+            display: inline;
+        }
+
+        .copy-button {
+            background: #e9ecef;
+            border: none;
+            color: #6c757d;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .copy-button:hover {
+            background: #87CEEB;
+            color: #1a1a1a;
+        }
+
+        .expand-button {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            color: #6c757d;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .expand-button:hover {
+            background: #e9ecef;
+        }
+
+        .message-display {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 13px;
+            color: #1a1a1a;
+            line-height: 1.4;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        .message-display.empty {
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .block-info {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 12px;
+            border: 1px solid #e9ecef;
+        }
+
+        .block-header {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .block-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .block-detail {
+            text-align: center;
+            background: #fff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+        }
+
+        .block-detail-label {
+            font-size: 11px;
+            color: #6c757d;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .block-detail-value {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a1a;
+            font-family: 'Monaco', 'Menlo', monospace;
+        }
+
+        .timeline-section {
+            margin-top: 16px;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 24px;
+            bottom: -16px;
+            width: 2px;
+            background: #e9ecef;
+        }
+
+        .timeline-item:last-child::before {
+            display: none;
+        }
+
+        .timeline-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4CAF50;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-right: 16px;
+            flex-shrink: 0;
+            z-index: 1;
+            position: relative;
+        }
+
+        .timeline-content {
+            flex: 1;
+            padding-top: 1px;
+        }
+
+        .timeline-event {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+
+        .timeline-time {
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        .json-viewer {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 12px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 11px;
+            line-height: 1.4;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .explorer-links {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .explorer-link {
+            flex: 1;
+            background: #87CEEB;
+            color: #1a1a1a;
+            text-decoration: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .explorer-link:hover {
+            background: #6bb6ff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(135, 206, 235, 0.3);
+        }
+
+        .related-transactions {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .related-tx-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            border: 1px solid #e9ecef;
+        }
+
+        .related-tx-item:hover {
+            background: #e9ecef;
+        }
+
+        .related-tx-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .related-tx-hash {
+            font-family: 'Monaco', 'Menlo', monospace;
+            color: #87CEEB;
+            font-weight: 500;
+        }
+
+        .related-tx-type {
+            color: #6c757d;
+            font-size: 11px;
+        }
+
+        .action-bar {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            gap: 12px;
+        }
+
+        .action-button {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .action-button.primary {
+            background: #87CEEB;
+            color: #1a1a1a;
+        }
+
+        .action-button.primary:hover {
+            background: #6bb6ff;
+            transform: translateY(-1px);
+        }
+
+        .action-button.secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .action-button.secondary:hover {
+            background: #5a6268;
+            transform: translateY(-1px);
+        }
+
+        .action-button.outline {
+            background: transparent;
+            color: #87CEEB;
+            border: 1px solid #87CEEB;
+        }
+
+        .action-button.outline:hover {
+            background: #87CEEB;
+            color: #1a1a1a;
+        }
+
+        .expandable-section {
+            margin-top: 12px;
+        }
+
+        .expand-toggle {
+            background: none;
+            border: none;
+            color: #87CEEB;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 0;
+            transition: color 0.3s ease;
+        }
+
+        .expand-toggle:hover {
+            color: #6bb6ff;
+        }
+
+        .expand-icon {
+            font-size: 12px;
+            transition: transform 0.3s ease;
+        }
+
+        .expand-toggle.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+
+        .expandable-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .expandable-content.expanded {
+            max-height: 500px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loading-placeholder {
+            background: #f8f9fa;
+            border-radius: 4px;
+            height: 16px;
+            margin-bottom: 8px;
+            animation: shimmer 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes shimmer {
+            0% { opacity: 0.5; }
+            100% { opacity: 0.8; }
+        }
+    </style>
+</head>
+<body>
+    <div class="details-container">
+        <div class="details-header">
+            <button class="back-button" id="backButton">←</button>
+            <button class="share-button" id="shareButton">📤</button>
+            <div class="details-title">Transaction Details</div>
+            <div class="details-subtitle">Republic of Suncity Blockchain</div>
+        </div>
+
+        <div class="details-content">
+            <!-- Status Banner -->
+            <div class="status-banner">
+                <div class="status-indicator success" id="statusIndicator">
+                    ✅ Confirmed
+                </div>
+                <div class="tx-hash-display" id="txHashDisplay">
+                    TX1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF
+                </div>
+                <div class="confirmations-info" id="confirmationsInfo">
+                    25 Confirmations • Block #234,567
+                </div>
+            </div>
+
+            <!-- Transaction Overview -->
+            <div class="section-card">
+                <div class="section-header">
+                    <div class="section-icon">💸</div>
+                    <div class="section-title">Transaction Overview</div>
+                </div>
+                
+                <div class="detail-row">
+                    <div class="detail-label">Type:</div>
+                    <div class="detail-value" id="txType">Token Transfer</div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">Amount:</div>
+                    <div class="detail-value amount positive" id="txAmount">+100.000000 SUNC</div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">Fee:</div>
+                    <div class="detail-value fee" id="txFee">0.005000 SUNC</div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">Date:</div>
+                    <div class="detail-value" id="txDate">March 15, 2024, 2:30 PM</div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">Status:</div>
+                    <div class="detail-value" id="txStatus">Success</div>
+                </div>
+            </div>
+
+            <!-- Addresses -->
+            <div class="section-card">
+                <div class="section-header">
+                    <div class="section-icon">📍</div>
+                    <div class="section-title">Addresses</div>
+                </div>
+                
+                <div class="detail-row">
+                    <div class="detail-label">From:</div>
+                    <div class="detail-value">
+                        <div class="address-value" id="fromAddress">
+                            <div class="address-text">
+                                <span class="address-short">sunc1qjsj...w6v5</span>
+                                <span class="address-full">sunc1qjsj8k2lm9xrtvn3p4k6j8h9g7f5d4c3b2a1z9x8y7w6v5</span>
+                            </div>
+                            <button class="expand-button" onclick="toggleAddress('fromAddress')">Full</button>
+                            <button class="copy-button" onclick="copyAddress('fromAddress')">Copy</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">To:</div>
+                    <div class="detail-value">
+                        <div class="address-value" id="toAddress">
+                            <div class="address-text">
+                                <span class="address-short">sunc1rec...a1z9</span>
+                                <span class="address-full">sunc1recipient8k2lm9xrtvn3p4k6j8h9g7f5d4c3b2a1z9</span>
+                            </div>
+                            <button class="expand-button" onclick="toggleAddress('toAddress')">Full</button>
+                            <button class="copy-button" onclick="copyAddress('toAddress')">Copy</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Technical Details -->
+            <div class="section-card">
+                <div class="section-header">
+                    <div class="section-icon">⚙️</div>
+                    <div class="section-title">Technical Details</div>
+                </div>
+                
+                <div class="detail-row">
+                    <div class="detail-label">Gas Used:</div>
+                    <div class="detail-value mono" id="gasUsed">185,420 / 200,000</div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">Gas Price:</div>
+                    <div class="detail-value mono" id="gasPrice">0.025 SUNC</div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">Nonce:</div>
+                    <div class="detail-value mono" id="nonce">42</div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">Transaction Index:</div>
+                    <div class="detail-value mono" id="txIndex">7</div>
+                </div>
+
+                <!-- Block Information -->
+                <div class="block-info">
+                    <div class="block-header">
+                        📦 Block Information
+                    </div>
+                    <div class="block-details">
+                        <div class="block-detail">
+                            <div class="block-detail-label">Height</div>
+                            <div class="block-detail-value" id="blockHeight">234,567</div>
+                        </div>
+                        <div class="block-detail">
+                            <div class="block-detail-label">Timestamp</div>
+                            <div class="block-detail-value" id="blockTimestamp">15:30:45</div>
+                        </div>
+                        <div class="block-detail">
+                            <div class="block-detail-label">Proposer</div>
+                            <div class="block-detail-value" id="blockProposer">sunc1val...xyz</div>
+                        </div>
+                        <div class="block-detail">
+                            <div class="block-detail-label">Size</div>
+                            <div class="block-detail-value" id="blockSize">2.4 KB</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Message/Memo -->
+            <div class="section-card">
+                <div class="section-header">
+                    <div class="section-icon">💬</div>
+                    <div class="section-title">Message</div>
+                </div>
+                
+                <div class="message-display" id="txMessage">
+                    Payment for services rendered - Invoice #INV-2024-001
+                </div>
+            </div>
+
+            <!-- Transaction Timeline -->
+            <div class="section-card">
+                <div class="section-header">
+                    <div class="section-icon">⏰</div>
+                    <div class="section-title">Transaction Timeline</div>
+                </div>
+                
+                <div class="timeline-section">
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-event">Transaction Submitted</div>
+                            <div class="timeline-time">March 15, 2024 at 2:30:15 PM</div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-event">Added to Mempool</div>
+                            <div class="timeline-time">March 15, 2024 at 2:30:18 PM</div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-event">Included in Block #234,567</div>
+                            <div class="timeline-time">March 15, 2024 at 2:30:45 PM</div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-event">Transaction Confirmed</div>
+                            <div class="timeline-time">March 15, 2024 at 2:31:15 PM</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Advanced Details (Expandable) -->
+            <div class="section-card">
+                <div class="section-header">
+                    <div class="section-icon">🔧</div>
+                    <div class="section-title">Advanced Details</div>
+                </div>
+                
+                <div class="expandable-section">
+                    <button class="expand-toggle" id="rawDataToggle">
+                        <span class="expand-icon">▼</span>
+                        Raw Transaction Data
+                    </button>
+                    <div class="expandable-content" id="rawDataContent">
+                        <div class="json-viewer" id="rawTransactionData">
+                            {
+                              "hash": "TX1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF",
+                              "height": "234567",
+                              "index": 7,
+                              "tx_result": {
+                                "code": 0,
+                                "data": "",
+                                "log": "transaction successful",
+                                "info": "",
+                                "gas_wanted": "200000",
+                                "gas_used": "185420",
+                                "events": [...]
+                              },
+                              "tx": "base64_encoded_transaction_data"
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="expandable-section">
+                    <button class="expand-toggle" id="relatedTxToggle">
+                        <span class="expand-icon">▼</span>
+                        Related Transactions
+                    </button>
+                    <div class="expandable-content" id="relatedTxContent">
+                        <div class="related-transactions">
+                            <div class="related-tx-item" onclick="viewTransaction('TX9876543210FEDCBA')">
+                                <div>
+                                    <div class="related-tx-hash">TX9876...EDCBA</div>
+                                    <div class="related-tx-type">Previous transaction</div>
+                                </div>
+                                <div style="color: #6c757d; font-size: 11px;">2 hrs ago</div>
+                            </div>
+                            
+                            <div class="related-tx-item" onclick="viewTransaction('TX1111222233334444')">
+                                <div>
+                                    <div class="related-tx-hash">TX1111...4444</div>
+                                    <div class="related-tx-type">Same block</div>
+                                </div>
+                                <div style="color: #6c757d; font-size: 11px;">Same time</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Block Explorer Links -->
+            <div class="explorer-links">
+                <a href="#" class="explorer-link" id="viewOnExplorer">
+                    🔍 View on Explorer
+                </a>
+                <a href="#" class="explorer-link" id="viewBlock">
+                    📦 View Block
+                </a>
+            </div>
+        </div>
+
+        <!-- Action Bar -->
+        <div class="action-bar">
+            <button class="action-button outline" id="copyHashButton">
+                <span>📋</span> Copy Hash
+            </button>
+            <button class="action-button secondary" id="newTxButton">
+                <span>💸</span> New Transaction
+            </button>
+            <button class="action-button primary" id="backToWalletButton">
+                <span>🏠</span> Back to Wallet
+            </button>
+        </div>
+    </div>
+
+    <script>
+        class TransactionDetailsHandler {
+            constructor() {
+                this.transactionData = {};
+                this.init();
+            }
+
+            init() {
+                this.loadTransactionData();
+                this.setupEventListeners();
+            }
+
+            setupEventListeners() {
+                // Back button
+                document.getElementById('backButton').addEventListener('click', () => {
+                    window.history.back();
+                });
+
+                // Share button
+                document.getElementById('shareButton').addEventListener('click', () => {
+                    this.shareTransaction();
+                });
+
+                // Expandable sections
+                document.getElementById('rawDataToggle').addEventListener('click', () => {
+                    this.toggleSection('rawDataToggle', 'rawDataContent');
+                });
+
+                document.getElementById('relatedTxToggle').addEventListener('click', () => {
+                    this.toggleSection('relatedTxToggle', 'relatedTxContent');
+                });
+
+                // Action buttons
+                document.getElementById('copyHashButton').addEventListener('click', () => {
+                    this.copyTransactionHash();
+                });
+
+                document.getElementById('newTxButton').addEventListener('click', () => {
+                    this.openNewTransaction();
+                });
+
+                document.getElementById('backToWalletButton').addEventListener('click', () => {
+                    window.close();
+                });
+
+                // Explorer links
+                document.getElementById('viewOnExplorer').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.openExplorer('transaction');
+                });
+
+                document.getElementById('viewBlock').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.openExplorer('block');
+                });
+            }
+
+            loadTransactionData() {
+                // Get transaction data from URL parameters
+                const urlParams = new URLSearchParams(window.location.search);
+                const txHash = urlParams.get('hash') || 'TX1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF';
+                
+                // Mock transaction data - in real implementation, fetch from blockchain
+                this.transactionData = {
+                    hash: txHash,
+                    type: 'Token Transfer',
+                    status: 'confirmed',
+                    amount: '100.000000',
+                    fee: '0.005000',
+                    from: 'sunc1qjsj8k2lm9xrtvn3p4k6j8h9g7f5d4c3b2a1z9x8y7w6v5',
+                    to: 'sunc1recipient8k2lm9xrtvn3p4k6j8h9g7f5d4c3b2a1z9',
+                    blockHeight: 234567,
+                    blockHash: 'BLOCK1234567890ABCDEF',
+                    timestamp: Date.now() - 3600000, // 1 hour ago
+                    gasUsed: 185420,
+                    gasLimit: 200000,
+                    gasPrice: '0.025',
+                    nonce: 42,
+                    txIndex: 7,
+                    confirmations: 25,
+                    memo: 'Payment for services rendered - Invoice #INV-2024-001'
+                };
+
+                this.updateDisplay();
+            }
+
+            updateDisplay() {
+                const data = this.transactionData;
+
+                // Update status indicator
+                const statusIndicator = document.getElementById('statusIndicator');
+                statusIndicator.textContent = data.status === 'confirmed' ? '✅ Confirmed' : 
+                                            data.status === 'pending' ? '⏳ Pending' : '❌ Failed';
+                statusIndicator.className = `status-indicator ${data.status === 'confirmed' ? 'success' : 
+                                                                data.status === 'pending' ? 'pending' : 'failed'}`;
+
+                // Update hash display
+                document.getElementById('txHashDisplay').textContent = data.hash;
+
+                // Update confirmations
+                document.getElementById('confirmationsInfo').textContent = 
+                    `${data.confirmations} Confirmations • Block #${data.blockHeight.toLocaleString()}`;
+
+                // Update overview
+                document.getElementById('txType').textContent = data.type;
+                document.getElementById('txAmount').textContent = `+${data.amount} SUNC`;
+                document.getElementById('txFee').textContent = `${data.fee} SUNC`;
+                document.getElementById('txDate').textContent = this.formatDate(data.timestamp);
+                document.getElementById('txStatus').textContent = data.status.charAt(0).toUpperCase() + data.status.slice(1);
+
+                // Update technical details
+                document.getElementById('gasUsed').textContent = `${data.gasUsed.toLocaleString()} / ${data.gasLimit.toLocaleString()}`;
+                document.getElementById('gasPrice').textContent = `${data.gasPrice} SUNC`;
+                document.getElementById('nonce').textContent = data.nonce;
+                document.getElementById('txIndex').textContent = data.txIndex;
+
+                // Update block info
+                document.getElementById('blockHeight').textContent = data.blockHeight.toLocaleString();
+                document.getElementById('blockTimestamp').textContent = this.formatTime(data.timestamp);
+                document.getElementById('blockProposer').textContent = 'sunc1val...xyz';
+                document.getElementById('blockSize').textContent = '2.4 KB';
+
+                // Update message
+                const messageEl = document.getElementById('txMessage');
+                if (data.memo) {
+                    messageEl.textContent = data.memo;
+                    messageEl.classList.remove('empty');
+                } else {
+                    messageEl.textContent = 'No message provided';
+                    messageEl.classList.add('empty');
+                }
+            }
+
+            toggleSection(toggleId, contentId) {
+                const toggle = document.getElementById(toggleId);
+                const content = document.getElementById(contentId);
+                
+                if (content.classList.contains('expanded')) {
+                    content.classList.remove('expanded');
+                    toggle.classList.remove('expanded');
+                } else {
+                    content.classList.add('expanded');
+                    toggle.classList.add('expanded');
+                }
+            }
+
+            shareTransaction() {
+                const shareData = {
+                    title: 'Republic of Suncity Transaction',
+                    text: `Transaction ${this.transactionData.hash.slice(0, 16)}...`,
+                    url: window.location.href
+                };
+
+                if (navigator.share) {
+                    navigator.share(shareData);
+                } else {
+                    // Fallback: copy to clipboard
+                    const shareText = `Transaction: ${this.transactionData.hash}\nAmount: ${this.transactionData.amount} SUNC\nView: ${window.location.href}`;
+                    navigator.clipboard.writeText(shareText);
+                    this.showNotification('Transaction details copied to clipboard!', 'success');
+                }
+            }
+
+            copyTransactionHash() {
+                navigator.clipboard.writeText(this.transactionData.hash);
+                this.showNotification('Transaction hash copied!', 'success');
+            }
+
+            openNewTransaction() {
+                // Close this window and open send modal in main wallet
+                window.close();
+            }
+
+            openExplorer(type) {
+                const baseUrl = 'https://explorer.suncity.gov';
+                const url = type === 'transaction' 
+                    ? `${baseUrl}/tx/${this.transactionData.hash}`
+                    : `${baseUrl}/block/${this.transactionData.blockHeight}`;
+                
+                window.open(url, '_blank');
+            }
+
+            formatDate(timestamp) {
+                return new Date(timestamp).toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+
+            formatTime(timestamp) {
+                return new Date(timestamp).toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+            }
+
+            showNotification(message, type = 'success') {
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.textContent = message;
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: ${type === 'success' ? '#4CAF50' : '#f44336'};
+                    color: white;
+                    padding: 12px 16px;
+                    border-radius: 8px;
+                    font-weight: 500;
+                    z-index: 2000;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                `;
+                
+                document.body.appendChild(notification);
+                setTimeout(() => notification.remove(), 3000);
+            }
+        }
+
+        // Address toggle functions
+        function toggleAddress(addressId) {
+            const addressElement = document.getElementById(addressId);
+            addressElement.classList.toggle('expanded');
+            
+            const button = addressElement.querySelector('.expand-button');
+            button.textContent = addressElement.classList.contains('expanded') ? 'Short' : 'Full';
+        }
+
+        function copyAddress(addressId) {
+            const addressElement = document.getElementById(addressId);
+            const fullAddress = addressElement.querySelector('.address-full').textContent;
+            
+            navigator.clipboard.writeText(fullAddress);
+            
+            const handler = window.detailsHandler;
+            if (handler) {
+                handler.showNotification('Address copied!', 'success');
+            }
+        }
+
+        function viewTransaction(hash) {
+            // Open transaction details for related transaction
+            const newUrl = `transaction-details.html?hash=${hash}`;
+            window.location.href = newUrl;
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            window.detailsHandler = new TransactionDetailsHandler();
+        });
+    </script>
+</body>
+</html>

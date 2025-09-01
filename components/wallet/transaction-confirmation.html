@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction Confirmation - Republic of Suncity Wallet</title>
+    <link rel="stylesheet" href="../popup/popup.css">
+    <link rel="stylesheet" href="../styles/components.css">
+    <style>
+        body {
+            width: 400px;
+            height: 600px;
+            margin: 0;
+            font-family: 'Inter', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #87CEEB 0%, #b8dcf0 100%);
+        }
+
+        .confirmation-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .confirmation-header {
+            background: #87CEEB;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .back-button {
+            position: absolute;
+            left: 15px;
+            top: 20px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #1a1a1a;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .confirmation-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin: 0;
+        }
+
+        .confirmation-subtitle {
+            font-size: 12px;
+            color: #555;
+            margin-top: 4px;
+        }
+
+        .confirmation-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .status-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid #e0e6ed;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .status-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .status-icon.pending {
+            color: #FF9800;
+            animation: pulse 2s ease-in-out infinite alternate;
+        }
+
+        .status-icon.confirmed {
+            color: #4CAF50;
+        }
+
+        .status-icon.failed {
+            color: #f44336;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
+        .status-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .status-message {
+            font-size: 14px;
+            color: #6c757d;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .confirmation-count {
+            background: #f8f9fa;
+            border-radius: 20px;
+            padding: 6px 16px;
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #1a1a1a;
+            border: 1px solid #e9ecef;
+        }
+
+        .confirmation-count.confirmed {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: #4CAF50;
+            color: #2e7d32;
+        }
+
+        .transaction-details {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid #e0e6ed;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .details-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .details-icon {
+            font-size: 20px;
+            margin-right: 12px;
+            color: #87CEEB;
+        }
+
+        .details-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-size: 14px;
+            color: #6c757d;
+            font-weight: 500;
+            min-width: 100px;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            color: #1a1a1a;
+            font-weight: 500;
+            text-align: right;
+            word-break: break-all;
+            flex: 1;
+            margin-left: 12px;
+        }
+
+        .detail-value.mono {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+        }
+
+        .detail-value.amount {
+            font-weight: 700;
+            color: #2e7d32;
+        }
+
+        .detail-value.fee {
+            color: #f57c00;
+        }
+
+        .copy-button {
+            background: #e9ecef;
+            border: none;
+            color: #6c757d;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            cursor: pointer;
+            margin-left: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .copy-button:hover {
+            background: #87CEEB;
+            color: #1a1a1a;
+        }
+
+        .timeline {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid #e0e6ed;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .timeline-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .timeline-icon {
+            font-size: 20px;
+            margin-right: 12px;
+            color: #87CEEB;
+        }
+
+        .timeline-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 24px;
+            bottom: -16px;
+            width: 2px;
+            background: #e9ecef;
+        }
+
+        .timeline-item:last-child::before {
+            display: none;
+        }
+
+        .timeline-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #e9ecef;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-right: 16px;
+            flex-shrink: 0;
+            z-index: 1;
+            position: relative;
+        }
+
+        .timeline-dot.completed {
+            background: #4CAF50;
+        }
+
+        .timeline-dot.current {
+            background: #FF9800;
+            animation: pulse 2s ease-in-out infinite alternate;
+        }
+
+        .timeline-content {
+            flex: 1;
+            padding-top: 1px;
+        }
+
+        .timeline-step {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+
+        .timeline-time {
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: #87CEEB;
+            color: #1a1a1a;
+            box-shadow: 0 2px 8px rgba(135, 206, 235, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: #6bb6ff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(135, 206, 235, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #87CEEB;
+            border: 2px solid #87CEEB;
+        }
+
+        .btn-outline:hover {
+            background: #87CEEB;
+            color: #1a1a1a;
+        }
+
+        .explorer-links {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+            border: 1px solid #e9ecef;
+        }
+
+        .explorer-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+        }
+
+        .explorer-link {
+            display: block;
+            color: #87CEEB;
+            text-decoration: none;
+            font-size: 12px;
+            margin-bottom: 8px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            background: rgba(135, 206, 235, 0.1);
+            transition: background 0.3s ease;
+        }
+
+        .explorer-link:hover {
+            background: rgba(135, 206, 235, 0.2);
+        }
+
+        .explorer-link:last-child {
+            margin-bottom: 0;
+        }
+
+        .refresh-button {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            color: #6c757d;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .refresh-button:hover {
+            background: #e9ecef;
+        }
+
+        .refresh-button.refreshing {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="confirmation-container">
+        <div class="confirmation-header">
+            <button class="back-button" id="backButton">←</button>
+            <div class="confirmation-title">Transaction Status</div>
+            <div class="confirmation-subtitle">Republic of Suncity Blockchain</div>
+        </div>
+
+        <div class="confirmation-content">
+            <!-- Transaction Status Card -->
+            <div class="status-card">
+                <div class="status-icon pending" id="statusIcon">⏳</div>
+                <div class="status-title" id="statusTitle">Transaction Pending</div>
+                <div class="status-message" id="statusMessage">
+                    Your transaction has been submitted to the Republic of Suncity blockchain and is awaiting confirmation.
+                </div>
+                <div class="confirmation-count" id="confirmationCount">
+                    Waiting for confirmation...
+                </div>
+                <button class="refresh-button" id="refreshButton">
+                    <span>🔄</span> Refresh Status
+                </button>
+            </div>
+
+            <!-- Transaction Details -->
+            <div class="transaction-details">
+                <div class="details-header">
+                    <div class="details-icon">📊</div>
+                    <div class="details-title">Transaction Details</div>
+                </div>
+                
+                <div class="detail-row">
+                    <div class="detail-label">Transaction Hash:</div>
+                    <div class="detail-value mono" id="txHash">
+                        Loading...
+                        <button class="copy-button" onclick="copyToClipboard('txHash')">Copy</button>
+                    </div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">From:</div>
+                    <div class="detail-value mono" id="fromAddress">
+                        sunc1qjsj8k2lm9xrtvn3p4k6j8h9g7f5d4c3b2a1z9x8y7w6v5
+                        <button class="copy-button" onclick="copyToClipboard('fromAddress')">Copy</button>
+                    </div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">To:</div>
+                    <div class="detail-value mono" id="toAddress">
+                        sunc1recipient8k2lm9xrtvn3p4k6j8h9g7f5d4c3b2a1z9
+                        <button class="copy-button" onclick="copyToClipboard('toAddress')">Copy</button>
+                    </div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">Amount:</div>
+                    <div class="detail-value amount" id="amount">100.000000 SUNC</div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">Transaction Fee:</div>
+                    <div class="detail-value fee" id="fee">0.005000 SUNC</div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">Gas Used:</div>
+                    <div class="detail-value" id="gasUsed">185,420 / 200,000</div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">Block Height:</div>
+                    <div class="detail-value" id="blockHeight">Pending...</div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">Timestamp:</div>
+                    <div class="detail-value" id="timestamp">Just now</div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-label">Memo:</div>
+                    <div class="detail-value" id="memo">Payment for services</div>
+                </div>
+
+                <!-- Explorer Links -->
+                <div class="explorer-links">
+                    <div class="explorer-title">View on Block Explorer</div>
+                    <a href="#" class="explorer-link" id="explorerTxLink">
+                        🔍 View Transaction Details
+                    </a>
+                    <a href="#" class="explorer-link" id="explorerBlockLink">
+                        📦 View Block Information
+                    </a>
+                </div>
+            </div>
+
+            <!-- Transaction Timeline -->
+            <div class="timeline">
+                <div class="timeline-header">
+                    <div class="timeline-icon">⏰</div>
+                    <div class="timeline-title">Transaction Timeline</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-dot completed"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-step">Transaction Submitted</div>
+                        <div class="timeline-time" id="submittedTime">2 minutes ago</div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-dot current" id="mempoolDot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-step">In Mempool</div>
+                        <div class="timeline-time" id="mempoolTime">Waiting for inclusion in block...</div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-dot" id="blockDot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-step">Included in Block</div>
+                        <div class="timeline-time" id="blockTime">Pending...</div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-dot" id="confirmDot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-step">Confirmed</div>
+                        <div class="timeline-time" id="confirmTime">Pending...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons" style="padding: 20px; background: rgba(255,255,255,0.95); border-top: 1px solid #e9ecef;">
+            <button class="btn btn-outline" id="shareButton">
+                <span>📤</span>
+                Share
+            </button>
+            <button class="btn btn-secondary" id="newTransactionButton">
+                <span>💸</span>
+                New Transaction
+            </button>
+            <button class="btn btn-primary" id="returnToWalletButton">
+                <span>🏠</span>
+                Return to Wallet
+            </button>
+        </div>
+    </div>
+
+    <script>
+        class TransactionConfirmationHandler {
+            constructor() {
+                this.transactionData = {};
+                this.confirmationStatus = 'pending'; // pending, confirmed, failed
+                this.confirmationCount = 0;
+                this.refreshInterval = null;
+                
+                this.init();
+            }
+
+            init() {
+                this.loadTransactionData();
+                this.setupEventListeners();
+                this.startStatusMonitoring();
+            }
+
+            setupEventListeners() {
+                // Back button
+                document.getElementById('backButton').addEventListener('click', () => {
+                    window.close();
+                });
+
+                // Refresh button
+                document.getElementById('refreshButton').addEventListener('click', () => {
+                    this.refreshTransactionStatus();
+                });
+
+                // Action buttons
+                document.getElementById('shareButton').addEventListener('click', () => {
+                    this.shareTransaction();
+                });
+
+                document.getElementById('newTransactionButton').addEventListener('click', () => {
+                    this.openNewTransaction();
+                });
+
+                document.getElementById('returnToWalletButton').addEventListener('click', () => {
+                    this.returnToWallet();
+                });
+            }
+
+            loadTransactionData() {
+                // Get transaction data from URL parameters or storage
+                const urlParams = new URLSearchParams(window.location.search);
+                const txHash = urlParams.get('hash') || this.generateMockTxHash();
+                
+                // Mock transaction data - in real implementation, fetch from blockchain
+                this.transactionData = {
+                    hash: txHash,
+                    from: 'sunc1qjsj8k2lm9xrtvn3p4k6j8h9g7f5d4c3b2a1z9x8y7w6v5',
+                    to: 'sunc1recipient8k2lm9xrtvn3p4k6j8h9g7f5d4c3b2a1z9',
+                    amount: '100.000000',
+                    fee: '0.005000',
+                    gasUsed: '185420',
+                    gasLimit: '200000',
+                    memo: 'Payment for services',
+                    timestamp: Date.now(),
+                    blockHeight: null,
+                    status: 'pending'
+                };
+
+                this.updateTransactionDisplay();
+            }
+
+            updateTransactionDisplay() {
+                // Update transaction details
+                document.getElementById('txHash').textContent = this.transactionData.hash;
+                document.getElementById('fromAddress').textContent = this.transactionData.from;
+                document.getElementById('toAddress').textContent = this.transactionData.to;
+                document.getElementById('amount').textContent = `${this.transactionData.amount} SUNC`;
+                document.getElementById('fee').textContent = `${this.transactionData.fee} SUNC`;
+                document.getElementById('gasUsed').textContent = `${this.transactionData.gasUsed.toLocaleString()} / ${this.transactionData.gasLimit.toLocaleString()}`;
+                document.getElementById('memo').textContent = this.transactionData.memo || 'No memo';
+                
+                // Update timestamp
+                const timeAgo = this.getTimeAgo(this.transactionData.timestamp);
+                document.getElementById('timestamp').textContent = timeAgo;
+                document.getElementById('submittedTime').textContent = timeAgo;
+
+                // Update block height
+                if (this.transactionData.blockHeight) {
+                    document.getElementById('blockHeight').textContent = this.transactionData.blockHeight.toLocaleString();
+                } else {
+                    document.getElementById('blockHeight').textContent = 'Pending...';
+                }
+
+                // Update explorer links
+                document.getElementById('explorerTxLink').href = `#tx/${this.transactionData.hash}`;
+                if (this.transactionData.blockHeight) {
+                    document.getElementById('explorerBlockLink').href = `#block/${this.transactionData.blockHeight}`;
+                }
+            }
+
+            async refreshTransactionStatus() {
+                const refreshButton = document.getElementById('refreshButton');
+                refreshButton.classList.add('refreshing');
+
+                try {
+                    // Simulate fetching transaction status
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                    
+                    // Mock status progression
+                    if (this.confirmationStatus === 'pending') {
+                        const random = Math.random();
+                        if (random > 0.7) {
+                            this.confirmationStatus = 'confirmed';
+                            this.confirmationCount = Math.floor(Math.random() * 10) + 1;
+                            this.transactionData.blockHeight = Math.floor(Math.random() * 1000) + 234000;
+                            this.updateConfirmationStatus();
+                        }
+                    }
+                    
+                } catch (error) {
+                    console.error('Failed to refresh transaction status:', error);
+                } finally {
+                    refreshButton.classList.remove('refreshing');
+                }
+            }
+
+            updateConfirmationStatus() {
+                const statusIcon = document.getElementById('statusIcon');
+                const statusTitle = document.getElementById('statusTitle');
+                const statusMessage = document.getElementById('statusMessage');
+                const confirmationCount = document.getElementById('confirmationCount');
+
+                switch (this.confirmationStatus) {
+                    case 'pending':
+                        statusIcon.textContent = '⏳';
+                        statusIcon.className = 'status-icon pending';
+                        statusTitle.textContent = 'Transaction Pending';
+                        statusMessage.textContent = 'Your transaction has been submitted to the Republic of Suncity blockchain and is awaiting confirmation.';
+                        confirmationCount.textContent = 'Waiting for confirmation...';
+                        confirmationCount.className = 'confirmation-count';
+                        break;
+
+                    case 'confirmed':
+                        statusIcon.textContent = '✅';
+                        statusIcon.className = 'status-icon confirmed';
+                        statusTitle.textContent = 'Transaction Confirmed';
+                        statusMessage.textContent = 'Your transaction has been successfully confirmed on the Republic of Suncity blockchain.';
+                        confirmationCount.textContent = `${this.confirmationCount} Confirmations`;
+                        confirmationCount.className = 'confirmation-count confirmed';
+                        
+                        // Update timeline
+                        this.updateTimeline();
+                        break;
+
+                    case 'failed':
+                        statusIcon.textContent = '❌';
+                        statusIcon.className = 'status-icon failed';
+                        statusTitle.textContent = 'Transaction Failed';
+                        statusMessage.textContent = 'Your transaction failed to be processed. Please try again.';
+                        confirmationCount.textContent = 'Failed';
+                        confirmationCount.className = 'confirmation-count';
+                        break;
+                }
+
+                this.updateTransactionDisplay();
+            }
+
+            updateTimeline() {
+                if (this.confirmationStatus === 'confirmed') {
+                    // Update mempool status
+                    document.getElementById('mempoolDot').className = 'timeline-dot completed';
+                    document.getElementById('mempoolTime').textContent = '1 minute ago';
+
+                    // Update block inclusion
+                    document.getElementById('blockDot').className = 'timeline-dot completed';
+                    document.getElementById('blockTime').textContent = '30 seconds ago';
+
+                    // Update confirmation
+                    document.getElementById('confirmDot').className = 'timeline-dot completed';
+                    document.getElementById('confirmTime').textContent = 'Just now';
+                }
+            }
+
+            startStatusMonitoring() {
+                // Check transaction status every 10 seconds
+                this.refreshInterval = setInterval(() => {
+                    if (this.confirmationStatus === 'pending') {
+                        this.refreshTransactionStatus();
+                    } else {
+                        // Stop monitoring once confirmed or failed
+                        if (this.refreshInterval) {
+                            clearInterval(this.refreshInterval);
+                            this.refreshInterval = null;
+                        }
+                    }
+                }, 10000);
+            }
+
+            shareTransaction() {
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'Republic of Suncity Transaction',
+                        text: `Transaction ${this.transactionData.hash}`,
+                        url: window.location.href
+                    });
+                } else {
+                    // Fallback: copy to clipboard
+                    const shareText = `Transaction Hash: ${this.transactionData.hash}\nAmount: ${this.transactionData.amount} SUNC\nView: ${window.location.href}`;
+                    navigator.clipboard.writeText(shareText);
+                    this.showNotification('Transaction details copied to clipboard!', 'success');
+                }
+            }
+
+            openNewTransaction() {
+                // Open send modal in main wallet
+                window.close();
+                // In real implementation, would communicate with main wallet
+            }
+
+            returnToWallet() {
+                window.close();
+            }
+
+            generateMockTxHash() {
+                const chars = '0123456789ABCDEF';
+                let hash = 'TX';
+                for (let i = 0; i < 62; i++) {
+                    hash += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return hash;
+            }
+
+            getTimeAgo(timestamp) {
+                const now = Date.now();
+                const diff = now - timestamp;
+                
+                const seconds = Math.floor(diff / 1000);
+                const minutes = Math.floor(seconds / 60);
+                const hours = Math.floor(minutes / 60);
+                
+                if (minutes < 1) return 'Just now';
+                if (minutes < 60) return `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
+                if (hours < 24) return `${hours} hour${hours !== 1 ? 's' : ''} ago`;
+                
+                return new Date(timestamp).toLocaleDateString();
+            }
+
+            showNotification(message, type = 'success') {
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.textContent = message;
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: ${type === 'success' ? '#4CAF50' : '#f44336'};
+                    color: white;
+                    padding: 12px 16px;
+                    border-radius: 8px;
+                    font-weight: 500;
+                    z-index: 2000;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                `;
+                
+                document.body.appendChild(notification);
+                setTimeout(() => notification.remove(), 3000);
+            }
+        }
+
+        // Copy to clipboard functionality
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent.replace('Copy', '').trim();
+            navigator.clipboard.writeText(text).then(() => {
+                const handler = window.confirmationHandler || new TransactionConfirmationHandler();
+                handler.showNotification('Copied to clipboard!', 'success');
+            });
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            window.confirmationHandler = new TransactionConfirmationHandler();
+        });
+    </script>
+</body>
+</html>
